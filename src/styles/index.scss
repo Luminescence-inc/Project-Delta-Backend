@@ -1,0 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #0E2D52;
+    --white-color: #ffffff;
+    --black-color: #000000;
+}
+
+body {
+    color: var(--primary-color);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+}
+
+.icon {
+
+    &-menu,
+    &-cancel {
+        width: 24px;
+        height: 20px;
+
+        &>path {
+            fill: var(--primary-color);
+        }
+    }
+}
