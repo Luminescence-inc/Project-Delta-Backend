@@ -5,7 +5,7 @@ import './Input.scss';
 
 interface IInput {
   label: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   placeholder: string;
   type: string;
 }

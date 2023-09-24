@@ -24,6 +24,8 @@
             height: 100vh;
             box-shadow: 0 2px 2px -2px rgba(0, 0, 0, .2);
             position: relative;
+            background-color: var(--white-color);
+            z-index: 2;
 
             .icon-cancel {
                 position: absolute;

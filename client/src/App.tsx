@@ -10,6 +10,9 @@ import Onboarding from 'pages/Onboarding/Onboarding';
 import Login from 'pages/Authentication/Login/Login';
 import ForgotPassword from 'pages/Authentication/ForgotPassword/ForgotPassword';
 import ForgotPasswordFinal from 'pages/Authentication/ForgotPassword/ForgotPasswordFinal';
+import Signup from 'pages/Authentication/Signup/Signup';
+import BusinessProfile from 'pages/Authentication/Signup/BusinessProfile';
+import OperationInfo from 'pages/Authentication/Signup/OperationInfo';
 
 function App() {
   const { pathname } = useLocation();
@@ -31,6 +34,12 @@ function App() {
             path='/forgot-password-final'
             element={<ForgotPasswordFinal />}
           />
+          <Route path='/signup' element={<Signup />} />
+          <Route
+            path='/signup/business-profile'
+            element={<BusinessProfile />}
+          />
+          <Route path='/signup/operation-info' element={<OperationInfo />} />
         </Routes>
       </main>
       <Footer />
