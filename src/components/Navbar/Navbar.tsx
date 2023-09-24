@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { Link } from 'react-router-dom';
+
 import MenuIcon from 'assets/icons/menu-icon.svg?react';
 import CancelIcon from 'assets/icons/cancel-icon.svg?react';
 import Button from 'components/Button/Button';
@@ -13,7 +15,9 @@ const Navbar = () => {
     <div className='navbar'>
       {!menuOpen && (
         <nav>
-          <h2>Logo</h2>
+          <Link to='/'>
+            <h2>Logo</h2>
+          </Link>
           <MenuIcon className='icon-menu' onClick={() => setMenuOpen(true)} />
         </nav>
       )}
@@ -32,8 +36,18 @@ const Navbar = () => {
               <p>Discover Businesses</p>
             </li>
             <hr />
-            <Button label='Sign up' variant='primary' to='/signup' />
-            <Button label='Login' variant='transparent' />
+            <Button
+              label='Sign up'
+              variant='primary'
+              to='/signup'
+              onClick={() => setMenuOpen(false)}
+            />
+            <Button
+              label='Login'
+              variant='transparent'
+              to='/login'
+              onClick={() => setMenuOpen(false)}
+            />
           </ul>
         </div>
       )}

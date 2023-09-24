@@ -10,7 +10,7 @@ interface Icard {
 
 const Card = ({ icon, title, description }: Icard) => {
   return (
-    <div className='card'>
+    <div className='card card-home'>
       {icon}
       <h3>{title}</h3>
       <p>{description}</p>

@@ -1,6 +1,6 @@
 button.btn,
 a.btn {
-    height: 37px;
+
     width: 100%;
     outline: none;
     border: none;
@@ -13,6 +13,14 @@ a.btn {
     justify-content: center;
     text-decoration: none;
     padding: 8px;
+
+    &-md {
+        height: 37px;
+    }
+
+    &-lg {
+        height: 48px;
+    }
 
     &-default {
         background-color: var(--black-color);

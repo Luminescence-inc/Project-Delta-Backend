@@ -1,5 +1,7 @@
 .navbar {
     background-color: var(--white-color);
+    position: absolute;
+    width: 100%;
 
     nav {
         height: 84px;
@@ -19,7 +21,7 @@
 
         .nav-content {
             padding: 32px 16px;
-            height: 400px;
+            height: 100vh;
             box-shadow: 0 2px 2px -2px rgba(0, 0, 0, .2);
             position: relative;
 
@@ -48,7 +50,7 @@
                     margin: 20px 0 32px;
                 }
 
-                button:last-child {
+                a:last-child {
                     margin-top: 16px;
                 }
             }

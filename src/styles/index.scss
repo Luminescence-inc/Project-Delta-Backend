@@ -24,8 +24,14 @@ body {
     line-height: 24px;
 }
 
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 main {
     flex-grow: 1;
+    margin-top: 84px;
 }
 
 img {
@@ -52,44 +58,4 @@ img {
             fill: var(--primary-color);
         }
     }
-}
-
-.home {
-    background-color: var(--light-grey);
-}
-
-@media screen and (max-width: 500px) {
-    .home {
-        padding: 16px;
-
-        header {
-            h2 {
-                font-size: 24px;
-                font-weight: 700;
-                line-height: 40px;
-                text-align: center;
-                margin-top: 32px;
-            }
-
-            p {
-                font-size: 16px;
-                font-weight: 400;
-                text-align: center;
-                margin: 12px 0 28px;
-            }
-        }
-
-        section.section-why {
-            margin: 96px 0 120px;
-
-            h2 {
-                font-size: 24px;
-                font-weight: 700;
-                line-height: 40px;
-                text-align: center;
-                margin-bottom: 32px;
-            }
-        }
-    }
-
 }

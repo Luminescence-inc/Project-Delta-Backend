@@ -7,6 +7,8 @@ import MoneybagIcon from 'assets/icons/moneybag-icon.svg?react';
 import Button from 'components/Button/Button';
 import Card from './components/Card/Card';
 
+import './Home.scss';
+
 const Home = () => {
   return (
     <div className='home'>
@@ -16,7 +18,7 @@ const Home = () => {
         <p>
           Connecting Global all small and medium Businesses with their customers
         </p>
-        <Button label='Get Started' variant='primary' />
+        <Button label='Get Started' variant='primary' to='/onboarding' />
       </header>
 
       <section className='section-why'>
