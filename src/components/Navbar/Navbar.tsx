@@ -1,12 +1,11 @@
 /** @format */
 
 import { useState } from 'react';
-// import { Link } from 'react-router-dom';
 
 import MenuIcon from 'assets/icons/menu-icon.svg?react';
 import CancelIcon from 'assets/icons/cancel-icon.svg?react';
-import './Navbar.scss';
 import Button from 'components/Button/Button';
+import './Navbar.scss';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
