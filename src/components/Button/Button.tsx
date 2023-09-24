@@ -6,7 +6,7 @@ import './Button.scss';
 
 interface IButton {
   label: string;
-  variant: 'primary' | 'transparent' | 'default';
+  variant?: 'primary' | 'transparent' | 'default';
   to?: string;
 }
 

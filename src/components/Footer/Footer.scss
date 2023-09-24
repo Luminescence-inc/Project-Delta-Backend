@@ -1,17 +1,13 @@
 footer.footer {
     padding: 64px 16px;
     background-color: var(--black-color);
+    z-index: -1;
 }
 
 
 @media screen and (max-width: 500px) {
     footer.footer {
         color: var(--white-color);
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-
 
         .footer {
 
