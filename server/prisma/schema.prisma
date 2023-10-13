@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  uuid              String             @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  email             String             @unique @map("email")
+  firstName         String             @map("first_name")
+  lastName          String             @map("last_name")
+  password          String             @map("password")
+  role              Role               @default(CUSTOMER) @map("role")
+  verified          Boolean            @default(false) @map("verified")
+  createdUtc        DateTime           @default(now()) @map("created_utc") @db.Timestamp(6)
+  modifiedUtc       DateTime           @default(now()) @map("modified_utc") @db.Timestamp(6)
+  user_verification user_verification[]
+}
+
+model user_verification {
+  uuid         String    @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  uniqueString String    @unique @map("unique_string")
+  user         user?     @relation(fields: [useruuid], references: [uuid])
+  useruuid     String    @map("user_uuid") @db.Uuid
+  createdUtc   DateTime  @map("created_utc") @db.Timestamp(6)
+  expiresUtc   DateTime  @map("expires_utc") @db.Timestamp(6)
+}
+
+enum Role {
+  CUSTOMER
+  BUSINESS
+}
