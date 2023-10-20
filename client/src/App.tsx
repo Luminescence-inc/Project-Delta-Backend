@@ -13,6 +13,7 @@ import ForgotPasswordFinal from 'pages/Authentication/ForgotPassword/ForgotPassw
 import Signup from 'pages/Authentication/Signup/Signup';
 import BusinessProfile from 'pages/Authentication/Signup/BusinessProfile';
 import OperationInfo from 'pages/Authentication/Signup/OperationInfo';
+import ViewBusiness from 'pages/Home/Business/ViewBusiness';
 
 function App() {
   const { pathname } = useLocation();
@@ -40,6 +41,7 @@ function App() {
             element={<BusinessProfile />}
           />
           <Route path='/signup/operation-info' element={<OperationInfo />} />
+          <Route path='/view-your-business' element={<ViewBusiness />} />
         </Routes>
       </main>
       <Footer />

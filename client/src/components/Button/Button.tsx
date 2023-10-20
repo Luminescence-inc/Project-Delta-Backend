@@ -10,6 +10,7 @@ interface IButton {
   size?: 'md' | 'lg';
   to?: string;
   onClick?: () => void;
+  icon?: JSX.Element;
 }
 
 const Button = ({
@@ -18,6 +19,7 @@ const Button = ({
   size = 'md',
   to = '',
   onClick,
+  icon,
 }: IButton) => {
   const ButtonComponent = to ? Link : 'button';
   return (
@@ -26,6 +28,7 @@ const Button = ({
       to={to}
       onClick={onClick}
     >
+      {icon ? icon : null}
       {label}
     </ButtonComponent>
   );

@@ -26,7 +26,15 @@ const Login = () => {
           placeholder='Enter Password'
         />
 
-        <Button label='Submit' variant='primary' size='lg' />
+        <Button
+          to='/'
+          label='Submit'
+          variant='primary'
+          size='lg'
+          onClick={() => {
+            localStorage.setItem('isAuth', '1');
+          }}
+        />
 
         <Link className='forgot' to='/forgot-password'>
           <p>Forgot password?</p>
