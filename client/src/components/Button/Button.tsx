@@ -11,6 +11,7 @@ interface IButton {
   to?: string;
   onClick?: () => void;
   icon?: JSX.Element;
+  className?: string;
 }
 
 const Button = ({
@@ -20,11 +21,12 @@ const Button = ({
   to = '',
   onClick,
   icon,
+  className,
 }: IButton) => {
   const ButtonComponent = to ? Link : 'button';
   return (
     <ButtonComponent
-      className={`btn btn-${variant} btn-${size}`}
+      className={`${className} btn btn-${variant} btn-${size}`}
       to={to}
       onClick={onClick}
     >
