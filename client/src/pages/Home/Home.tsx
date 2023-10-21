@@ -4,12 +4,16 @@ import homeBgImage from 'assets/images/homebg-img.png';
 import BulbIcon from 'assets/icons/bulb-icon.svg?react';
 import HandshakeIcon from 'assets/icons/handshake-icon.svg?react';
 import MoneybagIcon from 'assets/icons/moneybag-icon.svg?react';
+import SearchIcon from 'assets/icons/mag-glass.svg?react';
+import PlusIcon from 'assets/icons/uil_plus.svg?react';
 import Button from 'components/Button/Button';
 import Card from './components/Card/Card';
 
 import './Home.scss';
 
 const Home = () => {
+  const isAuth = localStorage.getItem('isAuth');
+
   return (
     <div className='home'>
       <img src={homeBgImage} alt={homeBgImage} />
@@ -18,7 +22,26 @@ const Home = () => {
         <p>
           Connecting Global all small and medium Businesses with their customers
         </p>
-        <Button label='Get Started' variant='primary' to='/onboarding' />
+        {isAuth !== '1' && (
+          <Button label='Get Started' variant='primary' to='/onboarding' />
+        )}
+        {isAuth === '1' && (
+          <div className='button-wrapper'>
+            <Button
+              label='View your business'
+              variant='primary'
+              size='lg'
+              to='/view-your-business'
+              icon={<SearchIcon />}
+            />
+            <Button
+              label='Add a new business'
+              variant='transparent'
+              size='lg'
+              icon={<PlusIcon />}
+            />
+          </div>
+        )}
       </header>
 
       <section className='section-why'>
