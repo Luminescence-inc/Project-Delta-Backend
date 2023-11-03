@@ -56,6 +56,8 @@ const Home = () => {
         <p>
           Connecting Global all small and medium Businesses with their customers
         </p>
+
+        {!authenticated && <Button label='Get Started' variant='primary' to='/onboarding' />}
         
         {authenticated && (
           <div className='button-wrapper'>
