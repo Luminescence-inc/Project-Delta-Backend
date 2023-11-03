@@ -10,9 +10,43 @@ import Button from 'components/Button/Button';
 import Card from './components/Card/Card';
 
 import './Home.scss';
+import { useEffect, useState } from 'react';
+import { JwtPayload, TOKEN_NAME } from 'types/auth';
+import { isAuthenticated } from 'api/auth';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  const isAuth = localStorage.getItem('isAuth');
+  const navigate = useNavigate();
+  const [authenticated, setAuthenticated] = useState(false);
+  const [tokenData, setTokenData] = useState<JwtPayload | null>(null);
+
+  // window.location.reload();
+  
+  useEffect(()=>{
+    try {
+      const authToken = localStorage.getItem(TOKEN_NAME) as string;
+      const parsedToken: JwtPayload = authToken? JSON.parse(atob(authToken?.split('.')[1])): {}; //check atob
+      setTokenData(parsedToken);
+
+      isAuthenticated(authToken, parsedToken.id)
+      .then(()=>{
+        setAuthenticated(true);
+      })
+      .catch((err)=>{
+        setAuthenticated(false);
+        // console.error(err)
+        console.log("home-aut")
+      })
+  
+    } catch (error) {
+      console.error('Error parsing token: ', error);
+    }
+  }, []);
+
+  if(authenticated && !tokenData?.verified){
+    navigate("/verify-account");
+  }
+
 
   return (
     <div className='home'>
@@ -22,10 +56,10 @@ const Home = () => {
         <p>
           Connecting Global all small and medium Businesses with their customers
         </p>
-        {isAuth !== '1' && (
-          <Button label='Get Started' variant='primary' to='/onboarding' />
-        )}
-        {isAuth === '1' && (
+
+        {!authenticated && <Button label='Get Started' variant='primary' to='/onboarding' />}
+        
+        {authenticated && (
           <div className='button-wrapper'>
             <Button
               label='View your business'
@@ -38,6 +72,7 @@ const Home = () => {
               label='Add a new business'
               variant='transparent'
               size='lg'
+              to='/signup/business-profile'
               icon={<PlusIcon />}
             />
           </div>
