@@ -12,6 +12,7 @@ interface IButton {
   onClick?: () => void;
   icon?: JSX.Element;
   className?: string;
+  type?: "button" | "submit" | "reset" | undefined;
 }
 
 const Button = ({
@@ -22,6 +23,7 @@ const Button = ({
   onClick,
   icon,
   className,
+  type
 }: IButton) => {
   const ButtonComponent = to ? Link : 'button';
   return (
@@ -29,6 +31,7 @@ const Button = ({
       className={`${className} btn btn-${variant} btn-${size}`}
       to={to}
       onClick={onClick}
+      type={type}
     >
       {icon ? icon : null}
       {label}

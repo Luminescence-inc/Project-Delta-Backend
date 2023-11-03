@@ -20,19 +20,26 @@ model user {
   verified          Boolean            @default(false) @map("verified")
   createdUtc        DateTime           @default(now()) @map("created_utc") @db.Timestamp(6)
   modifiedUtc       DateTime           @default(now()) @map("modified_utc") @db.Timestamp(6)
+  token             String[]           @map("token")
   user_verification user_verification[]
 }
 
 model user_verification {
-  uuid         String    @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
-  uniqueString String    @unique @map("unique_string")
-  user         user?     @relation(fields: [useruuid], references: [uuid])
-  useruuid     String    @map("user_uuid") @db.Uuid
-  createdUtc   DateTime  @map("created_utc") @db.Timestamp(6)
-  expiresUtc   DateTime  @map("expires_utc") @db.Timestamp(6)
+  uuid         String           @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  uniqueString String           @unique @map("unique_string")
+  user         user?            @relation(fields: [useruuid], references: [uuid])
+  type         VerificationType @map("type")
+  useruuid     String           @map("user_uuid") @db.Uuid
+  createdUtc   DateTime         @map("created_utc") @db.Timestamp(6)
+  expiresUtc   DateTime         @map("expires_utc") @db.Timestamp(6)
 }
 
 enum Role {
   CUSTOMER
   BUSINESS
+}
+
+enum VerificationType {
+  EMAIL
+  PASSWORD
 }

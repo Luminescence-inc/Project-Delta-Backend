@@ -15,9 +15,9 @@ router.post('/api/user/login', validate(LoginRequestSchema), userController.logi
 
 router.get('/api/user/verify/:userId/:uniqueString', userController.verifyUserEmail)
 
-router.get('/api/user/generate/verification/:userEmail', userController.generateUserVerificationLink)
-
 router.post('/api/user/reset_password/:userId/:uniqueString', userController.resetUserPassword)
+
+// router.get('/api/user/generate/verification/:userEmail', userController.generateUserVerificationLink)
 
 router.get('/api/user/generate/forgot_password/:userEmail', userController.generateUserForgotPassLink)
 
@@ -25,5 +25,8 @@ router.get('/api/user/validateToken', passport.authenticate('jwt', {session: fal
     return res.status(200).send("authorized")
 });
 
+router.get('/api/user/authenticated/:id', userController.isAuthenticated);
+
+router.get('/api/user/logout/:id', userController.logOut);
 
 export default router;

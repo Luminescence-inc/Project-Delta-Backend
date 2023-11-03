@@ -1,3 +1,4 @@
+import { VerificationType } from "@prisma/client";
 import prisma from "../utils/prisma.client";
 
 export default class userService {
@@ -15,15 +16,27 @@ export default class userService {
         return user
     }
 
-    async createUserVerification(useruuid: string, hashedUniqueString: string, createdUtc: number, expiresUtc: number){
-        return await prisma.user_verification.create({
-            data: {
-                useruuid,
-                uniqueString: hashedUniqueString,
-                createdUtc: new Date(createdUtc),
-                expiresUtc: new Date(expiresUtc)
-            }
-        })
+    async createUserVerification(useruuid: string, hashedUniqueString: string, createdUtc: number, expiresUtc: number, verificationType: VerificationType){
+        const verificationLinkExist = await this.findVerificationLinkByUserId(useruuid, verificationType)
+
+        if(verificationLinkExist){
+            return await prisma.user_verification.update({
+                where: {uuid: verificationLinkExist.uuid},
+                data: {uniqueString: hashedUniqueString, 
+                       createdUtc: new Date(createdUtc), 
+                       expiresUtc: new Date(expiresUtc)}
+            })
+        }else{
+            return await prisma.user_verification.create({
+                data: {
+                    useruuid,
+                    uniqueString: hashedUniqueString,
+                    type: verificationType,
+                    createdUtc: new Date(createdUtc),
+                    expiresUtc: new Date(expiresUtc)
+                }
+            })
+        }
     }
 
     async isEmailPresent(email: string): Promise<boolean>{
@@ -60,10 +73,11 @@ export default class userService {
         })
     }
 
-    async findVerificationLinkByUserId(useruuid: string){
-        return await prisma.user_verification.findMany({
+    async findVerificationLinkByUserId(useruuid: string, type: VerificationType){
+        return await prisma.user_verification.findFirst({
             where: {
-                useruuid
+                useruuid,
+                type
             }
         })
     }
@@ -73,6 +87,24 @@ export default class userService {
             where: {
                 uniqueString
             }
+        })
+    }
+
+    async findUserTokensById(uuid: string) {
+        return await prisma.user.findFirst({
+            where: {
+                uuid
+            },
+            select: {
+                token: true
+            }
+        })
+    }
+
+    async updatedUserTokens(useruuid: string, token: string[]) {
+        return await prisma.user.update({
+            where: {uuid: useruuid},
+            data: {token}
         })
     }
 

@@ -1,6 +1,6 @@
 /** @format */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Link } from 'react-router-dom';
 
@@ -10,9 +10,53 @@ import ArrowUpIcon from 'assets/icons/arrow-up.svg?react';
 import EditIcon from 'assets/icons/edit-icon.svg?react';
 import PlusIcon from 'assets/icons/uil_plus.svg?react';
 import Button from 'components/Button/Button';
+import { JwtPayload, TOKEN_NAME } from 'types/auth';
+import { isAuthenticated, logOut } from 'api/auth';
+import { useNavigate } from 'react-router-dom';
 import './Navbar.scss';
 
 const Navbar = () => {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [tokenData, setTokenData] = useState<JwtPayload | null>(null);
+  const navigate = useNavigate();
+  
+  useEffect(()=>{
+    try {
+      const authToken = localStorage.getItem(TOKEN_NAME) as string;
+      const parsedToken: JwtPayload = authToken? JSON.parse(atob(authToken?.split('.')[1])) : {};
+      setTokenData(parsedToken);
+      
+
+      isAuthenticated(authToken, parsedToken.id)
+      .then(()=>{
+        setAuthenticated(true);
+      })
+      .catch((err)=>{
+        setAuthenticated(false);
+        console.log("navbar-auth")
+        // console.error(err)
+      })
+  
+    } catch (error) {
+      console.error('Error parsing token: ', error);
+    }
+  }, []);
+
+  const handleLogOut = ()=>{
+    const authToken = localStorage.getItem(TOKEN_NAME) as string;
+    logOut(authToken, tokenData?.id || '').then(()=>{
+      localStorage.removeItem(TOKEN_NAME);
+      setAuthenticated(false);
+      // setMenuOpen(false);
+      window.location.reload();
+      navigate('/');
+    }).catch((err)=>{
+      console.error(err)
+    })
+    
+  }
+
+  
   const [menuOpen, setMenuOpen] = useState(false);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
 
@@ -37,12 +81,12 @@ const Navbar = () => {
 
           <ul className='nav-content-items'>
             <li>
-              <p>About us</p>
+              <p onClick={()=>{navigate('/'); setMenuOpen(false);}}>About us</p>
             </li>
             <li>
               <p>Discover Businesses</p>
             </li>
-            {isAuth === '1' && (
+            {authenticated && (
               <>
                 <li
                   className='edit-business'
@@ -86,24 +130,35 @@ const Navbar = () => {
               </>
             )}
             <hr />
-            {isAuth !== '1' && (
+            {!authenticated && (
+              <>
+                <Button
+                  label='Sign up'
+                  className='mb-4'
+                  variant='primary'
+                  to='/signup'
+                  onClick={() => setMenuOpen(false)}
+                />
+                <Button
+                label='Login'
+                variant='transparent'
+                to='/login'
+                onClick={() => {
+                  setMenuOpen(false);
+                }}
+                />
+              </>
+            )}
+            {authenticated && (
               <Button
-                label='Sign up'
-                className='mb-4'
-                variant='primary'
-                to='/signup'
-                onClick={() => setMenuOpen(false)}
+              label='Log out'
+              variant='transparent'
+              onClick={() => {
+                setMenuOpen(false);
+                handleLogOut();
+              }}
               />
             )}
-            <Button
-              label={isAuth === '1' ? 'Log out' : 'Login'}
-              variant='transparent'
-              to='/login'
-              onClick={() => {
-                localStorage.setItem('isAuth', '0');
-                setMenuOpen(false);
-              }}
-            />
 
             <p className='my-account'>My Account</p>
           </ul>
