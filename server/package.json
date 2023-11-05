@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start:dev": "tsx watch src/index.ts",
-    "start:prod": "npm run build && node ./dist/index.js",
+    "start:prod": "npx prisma migrate deploy && npx prisma generate && node ./dist/index.js",
     "build": "rimraf ./dist && run-p -s build:*",
     "build:main": "babel -x .ts -d dist src",
     "build:types": "tsc"

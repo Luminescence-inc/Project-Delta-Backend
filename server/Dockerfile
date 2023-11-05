@@ -34,11 +34,9 @@ COPY tsconfig.json ./
 
 COPY . .
 
-RUN npx prisma migrate deploy
 
-RUN npx prisma generate
 
-CMD ["npm","run", "start:dev"]
+CMD ["npm","run", "start:prod"]
 
 # FROM node:16-alpine as production
 
