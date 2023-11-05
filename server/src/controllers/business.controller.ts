@@ -50,9 +50,7 @@ export default class BusinessController {
         try {
             //standerdize empty string
             const filteredProfileBody = standardizeEmptyKeyValues(profileBody);
-            console.info("filteredProfileBody: ", filteredProfileBody)
             const updatedBusinessProfile = await this.businessService.updateBusinessProfileById(id, user.id, filteredProfileBody)
-            console.info("updatedBusinessProfile: ",updatedBusinessProfile)
             return respond.status(200).success(true).code(200).desc("Business Profile successful updated").responseData({updatedBusinessProfile}).send();
         } catch (error) {
             console.error(error);
