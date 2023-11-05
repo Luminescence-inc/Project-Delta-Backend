@@ -38,17 +38,19 @@ RUN npx prisma migrate deploy
 
 RUN npx prisma generate
 
-FROM node:16-alpine as production
+CMD ["npm","run", "start:dev"]
 
-ARG NODE_ENV=production
+# FROM node:16-alpine as production
 
-ENV NODE_ENV=${NODE_ENV}
+# ARG NODE_ENV=production
 
-COPY package*.json .
+# ENV NODE_ENV=${NODE_ENV}
 
-RUN npm ci --only=production
+# COPY package*.json .
 
-COPY --from=development /usr/src/app/dist/ .
+# RUN npm ci --only=production
 
-CMD ["node", "dist/index.js"]
+# COPY --from=development /usr/src/app/dist/ .
+# COPY --from=development /usr/src/app/prisma/ ./prisma/
+# CMD ["node", "dist/index.js"]
 
