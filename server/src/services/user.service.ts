@@ -1,19 +1,18 @@
-import { VerificationType } from "@prisma/client";
+import { Role, VerificationType } from "@prisma/client";
 import prisma from "../utils/prisma.client";
 
 export default class userService {
     static createUserVerification: any;
     
     async createUserDetails(firstName: string, lastName: string, email: string, password: string){
-        const user = await prisma.user.create({
+        return await prisma.user.create({
             data: {
                 firstName,
                 lastName,
                 email,
                 password
             }
-        })
-        return user
+        });
     }
 
     async createUserVerification(useruuid: string, hashedUniqueString: string, createdUtc: number, expiresUtc: number, verificationType: VerificationType){
@@ -105,6 +104,13 @@ export default class userService {
         return await prisma.user.update({
             where: {uuid: useruuid},
             data: {token}
+        })
+    }
+
+    async updatUserRole(useruuid: string, role: Role) {
+        return await prisma.user.update({
+            where: {uuid: useruuid},
+            data: {role}
         })
     }
 
