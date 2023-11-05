@@ -1,7 +1,8 @@
 import "dotenv/config";
 import express from 'express';
 import cors from 'cors';
-import userRoute from "./routes/user.route"
+import userRoute from "./routes/user.route";
+import businessRoute from "./routes/business.route";
 
 const app = express();
 const port = process.env.PORT || 5005;
@@ -23,6 +24,7 @@ app.use((req, res, next) => {
 });
 
 app.use(userRoute)
+app.use(businessRoute)
 
 
 app.listen(port, ()=>{
