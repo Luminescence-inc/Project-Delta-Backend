@@ -23,6 +23,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, Tag and push the image to Amazon ECR
+        working-directory: ./server
         id: build-image
         env:
           ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
