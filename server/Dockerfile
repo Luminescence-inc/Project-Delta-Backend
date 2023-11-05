@@ -8,7 +8,19 @@ RUN npm install
 
 COPY prisma ./prisma/
 
-COPY .env ./
+# COPY .env ./
+
+ENV DATABASE_URL = ${{ secrets.DATABASE_URL }}
+
+ENV PORT = ${{ secrets.PORT }}
+
+ENV JWT_TOKEN_SECRET = ${{ secrets.JWT_TOKEN_SECRET }}
+
+ENV JWT_TOKEN_SECRET_EXP = ${{ secrets.JWT_TOKEN_SECRET_EXP }}
+
+ENV AUTH_EMAIL = ${{ secrets.AUTH_EMAIL }}
+
+ENV AUTH_PASS = ${{ secrets.AUTH_PASS }}
 
 # COPY tsconfig.json file
 COPY tsconfig.json ./
