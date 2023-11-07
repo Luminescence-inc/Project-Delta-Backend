@@ -1,17 +1,17 @@
 #!/bin/bash
 
-Version=""
+VERSION=""
 
 # get parameters
 
 while getopts v: flag
 do
   case "${flag}" in 
-    v) Version=${OPTARG};;
+    v) VERSION=${OPTARG};;
   esac
 done
 
-echo "$Version"
+echo "$VERSION"
 # get highest tag number, and add v0.1.0 if it doesn't exit
 
 git fetch  --prune --unshallow 2>/dev/null
