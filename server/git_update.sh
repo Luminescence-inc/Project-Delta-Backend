@@ -11,6 +11,7 @@ do
   esac
 done
 
+echo "$Version"
 # get highest tag number, and add v0.1.0 if it doesn't exit
 
 git fetch  --prune --unshallow 2>/dev/null
