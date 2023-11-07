@@ -30,17 +30,17 @@ VNUM1=${CURRENT_VERSION_PARTS[0]}
 VNUM2=${CURRENT_VERSION_PARTS[1]}
 VNUM3=${CURRENT_VERSION_PARTS[2]}
 
-if[[$Version=='major']]
+if [ $VERSION == 'major' ]
 then
-  VNUM1=v$((VNUM1 + 1))
-elif [[ $Version== 'minor']]
+  VNUM1=v$((VNUM1+1))
+elif [ $VERSION == 'minor' ]
 then
-  VNUM1=v$((VNUM2 + 1))
-elif [[ $Version=='patch']]
+  VNUM2=$((VNUM2+1))
+elif [ $VERSION == 'patch' ]
 then
-  VNUM1=v$((VNUM3 + 1))
+  VNUM3=$((VNUM3+1))
 else
-  echo "No version type (https://semver.org/) or incorrect type specified, try -v [major, minor, patch]"
+  echo "No version type (https://semver.org/) or incorrect type specified, try: -v [major, minor, patch]"
   exit 1
 fi
 
