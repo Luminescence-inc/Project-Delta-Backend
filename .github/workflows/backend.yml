@@ -26,6 +26,7 @@ jobs:
         id: increment-git-tag
         run: |
           bash ./server/git_update.sh -v patch
+
       - name: Build, Tag and push the image to Amazon ECR
         working-directory: ./server
         id: build-image
