@@ -22,13 +22,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Automatic tagging of Releases
+        id: increment-git-tag
+        run: |
+          bash ./server/git_update.sh -v patch
       - name: Build, Tag and push the image to Amazon ECR
         working-directory: ./server
         id: build-image
         env:
           ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
           ECR_REPOSITORY: backend
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{steps.increment-git-tag.outputs.git-tag}}
         run: |
           touch .env 
           echo DATABASE_URL=${{secrets.DATABASE_URL}} >> .env
@@ -37,5 +41,6 @@ jobs:
           echo AUTH_EMAIL=${{secrets.AUTH_EMAIL}} >> .env
           echo JWT_TOKEN_SECRET_EXP=${{secrets.JWT_TOKEN_SECRET_EXP}} >> .env
           echo AUTH_PASS=${{secrets.AUTH_PASS}} >> .env
+          cat .env
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
