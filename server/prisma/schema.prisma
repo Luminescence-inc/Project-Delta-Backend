@@ -23,9 +23,6 @@ model user {
   token             String[]           @map("token")
   user_verification user_verification[]
   business_profiles business_profiles[]
-
-  //email -idx
-  //uuid -idx
 }
 
 model user_verification {
@@ -37,9 +34,8 @@ model user_verification {
   createdUtc   DateTime         @map("created_utc") @db.Timestamp(6)
   expiresUtc   DateTime         @map("expires_utc") @db.Timestamp(6)
 
-  // useruuid -idx
-  // uniqueString -idx
-  // type -idx
+  // DB Index
+  @@index([useruuid], map: "use_veriication_useruuid_idx")
 }
 
 model business_profiles {
@@ -69,12 +65,12 @@ model business_profiles {
   createdUtc              DateTime              @default(now()) @map("created_utc") @db.Timestamp(6)
   modifiedUtc             DateTime              @default(now()) @map("modified_utc") @db.Timestamp(6)
 
-  //userUuid -idx
-  //businessCategoryUuid -idx
-  //country -idx
-  //stateAndProvince -idx
-  //city -idx
-  //uuid -idx
+  // DB Index
+  @@index([userUuid], map: "business_profile_userUuid_idx")
+  @@index([country], map: "business_profile_country_idx")
+  @@index([stateAndProvince], map: "business_profile_stateAndProvince_idx")
+  @@index([city], map: "business_profile_city_idx")
+  @@index([businessCategoryUuid], map: "business_profile_businessCategoryUuid_idx")
 }
 
 model business_categories {

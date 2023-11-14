@@ -20,3 +20,23 @@ export interface BusinessCreationBody {
     twitterUrl?: string;
     facebookUrl?: string;
 }
+
+export interface BusinessSearchRequestBody {
+    paging: Paging;
+    search: Search;
+}
+
+export interface Search {
+    filters: Filters[];
+}
+export interface Paging {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortDirection: string;
+}
+
+export interface Filters {
+    targetFieldName: string;
+    values: string[] | string;
+}
