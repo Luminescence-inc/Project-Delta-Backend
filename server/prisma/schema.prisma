@@ -35,7 +35,7 @@ model user_verification {
   expiresUtc   DateTime         @map("expires_utc") @db.Timestamp(6)
 
   // DB Index
-  @@index([useruuid], map: "use_veriication_useruuid_idx")
+  @@index([useruuid], map: "user_veriication_useruuid_idx")
 }
 
 model business_profiles {
