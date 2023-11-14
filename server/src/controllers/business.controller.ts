@@ -1,13 +1,12 @@
-import { BusinessCreationRequestSchema } from "@src/schemas/businessCreationRequest.schema";
 import businessService from "@src/services/business.service";
-import { BusinessCreationBody } from "@src/types/business";
+import { BusinessCreationBody, BusinessSearchRequestBody } from "@src/types/business";
 import { Request, Response } from "express";
 import { JwtPayload } from "../types/auth";
-import { z } from "zod";
 import { removeEmptyOrNullKeyValues, standardizeEmptyKeyValues } from "@src/utils/jwt.util";
 import SendResponse from "@src/utils/response.util";
 import { Role } from "@prisma/client";
 import userService from "@src/services/user.service";
+import { BusinessProfileFilterField } from "@src/enums/business.enum";
 
 export default class BusinessController {
     private businessService: businessService;
@@ -17,6 +16,76 @@ export default class BusinessController {
     constructor() {
         this.businessService = new businessService();
         this.userService = new userService();
+    }
+
+    searchBusinessProfile = async(req: Request, res: Response) => {
+        const respond = new SendResponse(res);
+        const searchBody: BusinessSearchRequestBody = req.body;
+        try {
+            const sortBy = searchBody.paging.sortBy;
+            const sortDirection = searchBody.paging.sortDirection;
+            const page = searchBody.paging.page;
+            const take = searchBody.paging.limit;
+            const skip = (page - 1) * take;
+
+            const orderByClause: any = {}
+            const whereClause: any = {};
+
+            //Build orderByClause
+            if(sortBy && sortDirection){
+                orderByClause[sortBy] = sortDirection
+            }
+
+            //Build whereClause
+            searchBody.search.filters.forEach(element => {
+                switch(element.targetFieldName) {
+                    case BusinessProfileFilterField.BusinessCategoryUuid:
+                        if(element.values.length>0){
+                            whereClause[BusinessProfileFilterField.BusinessCategoryUuid] = {
+                                in: element.values as string[]
+                            }
+                        }     
+                        break;
+                    case BusinessProfileFilterField.Country:
+                        if(element.values.length>0){
+                            whereClause[BusinessProfileFilterField.Country] = {
+                                in: element.values as string[]
+                            }
+                        }   
+                        break;
+                    case BusinessProfileFilterField.StateAndProvince:
+                        if(element.values.length>0){
+                            whereClause[BusinessProfileFilterField.StateAndProvince] = {
+                                in: element.values as string[]
+                            }
+                        }
+                        break;        
+                    case BusinessProfileFilterField.City:
+                        if(element.values.length>0){
+                            whereClause[BusinessProfileFilterField.City] = {
+                                in: element.values as string[]
+                            }
+                        }
+                        break;
+                }
+            });
+
+            const total = await this.businessService.searchBusinessProfileCount(whereClause);
+            const data = await this.businessService.searchBusinessProfile(whereClause, take, skip, orderByClause);
+            const allBusinessProfile = {
+                data,
+                total,
+                page: page,
+                limit: take,
+                totalPages: Math.ceil(total / take)
+            }
+
+            return respond.status(200).success(true).code(200).desc("searched Business Profiles").responseData({businessProfiles: allBusinessProfile}).send();
+
+        } catch (error) {
+            console.error(error);
+            return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
+        }
     }
 
     createBusinessProfile = async(req: Request, res: Response) => {

@@ -54,6 +54,21 @@ export default class businessService {
         })
     }
 
+    async searchBusinessProfile(where: any, take: number, skip: number, orderBy: any) {
+        return await prisma.business_profiles.findMany({
+            where,
+            take,
+            skip,
+            orderBy
+        })
+    }
+
+    async searchBusinessProfileCount(where: any) {
+        return await prisma.business_profiles.count({
+            where
+        })
+    }
+
     async findAllBusinessCategories() {
         return await prisma.business_categories.findMany({
             select: {
