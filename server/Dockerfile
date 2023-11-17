@@ -13,7 +13,7 @@ COPY .env ./
 # COPY tsconfig.json file
 COPY tsconfig.json ./
 
-RUN npm build
+RUN npm run build
 
 COPY . .
 
