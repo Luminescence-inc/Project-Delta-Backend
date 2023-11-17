@@ -34,7 +34,7 @@ COPY tsconfig.json ./
 
 COPY . .
 
-
+EXPOSE 5005
 
 CMD ["npm","run", "start:prod"]
 
