@@ -1,79 +1,78 @@
-import prisma from "../utils/prisma.client";
+import prisma from '../utils/prisma.client.js';
 
 export default class userService {
-    static createUserVerification: any;
-    
-    async createUserDetails(firstName: string, lastName: string, email: string, password: string){
-        const user = await prisma.user.create({
-            data: {
-                firstName,
-                lastName,
-                email,
-                password
-            }
-        })
-        return user
-    }
+  static createUserVerification: any;
 
-    async createUserVerification(useruuid: string, hashedUniqueString: string, createdUtc: number, expiresUtc: number){
-        return await prisma.user_verification.create({
-            data: {
-                useruuid,
-                uniqueString: hashedUniqueString,
-                createdUtc: new Date(createdUtc),
-                expiresUtc: new Date(expiresUtc)
-            }
-        })
-    }
+  async createUserDetails(firstName: string, lastName: string, email: string, password: string) {
+    const user = await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password,
+      },
+    });
+    return user;
+  }
 
-    async isEmailPresent(email: string): Promise<boolean>{
-        const findEmail = await prisma.user.findFirst({
-            where: {
-                email
-            }
-        })
-        if(findEmail?.uuid){
-            return true;
-        }
-        return false;
-    }
+  async createUserVerification(useruuid: string, hashedUniqueString: string, createdUtc: number, expiresUtc: number) {
+    return await prisma.user_verification.create({
+      data: {
+        useruuid,
+        uniqueString: hashedUniqueString,
+        createdUtc: new Date(createdUtc),
+        expiresUtc: new Date(expiresUtc),
+      },
+    });
+  }
 
-    async findUserByEmail(email: string) {
-        return await prisma.user.findFirst({
-            where: {
-                email
-            }
-        })
+  async isEmailPresent(email: string): Promise<boolean> {
+    const findEmail = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    if (findEmail?.uuid) {
+      return true;
     }
+    return false;
+  }
 
-    async verifyUserById(useruuid: string) {
-        return await prisma.user.update({
-            where: {uuid: useruuid},
-            data: {verified: true}
-        })
-    }
+  async findUserByEmail(email: string) {
+    return await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+  }
 
-    async updatedUserPasswordById(useruuid: string, password: string) {
-        return await prisma.user.update({
-            where: {uuid: useruuid},
-            data: {password}
-        })
-    }
+  async verifyUserById(useruuid: string) {
+    return await prisma.user.update({
+      where: { uuid: useruuid },
+      data: { verified: true },
+    });
+  }
 
-    async findVerificationLinkByUserId(useruuid: string){
-        return await prisma.user_verification.findMany({
-            where: {
-                useruuid
-            }
-        })
-    }
+  async updatedUserPasswordById(useruuid: string, password: string) {
+    return await prisma.user.update({
+      where: { uuid: useruuid },
+      data: { password },
+    });
+  }
 
-    async deleteVerificationLink(uniqueString: string){
-        return await prisma.user_verification.delete({
-            where: {
-                uniqueString
-            }
-        })
-    }
+  async findVerificationLinkByUserId(useruuid: string) {
+    return await prisma.user_verification.findMany({
+      where: {
+        useruuid,
+      },
+    });
+  }
 
+  async deleteVerificationLink(uniqueString: string) {
+    return await prisma.user_verification.delete({
+      where: {
+        uniqueString,
+      },
+    });
+  }
 }

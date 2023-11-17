@@ -1,9 +1,9 @@
-import { z } from "zod";
-import { RequestSchema } from "./request.schema";
+import { z } from 'zod';
+import { RequestSchema } from './request.schema.js';
 
 export const LoginRequestSchema = RequestSchema.extend({
-    body: z.object({
-        email: z.string(),
-        password: z.string(),
-    }),
-  });
+  body: z.object({
+    email: z.string(),
+    password: z.string(),
+  }),
+});

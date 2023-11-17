@@ -1,14 +1,14 @@
 import { Response } from 'express';
 import { hashSync, compareSync } from 'bcrypt';
-import userService from '../services/user.service';
-import { JwtPayload } from '../types/auth';
+import userService from '../services/user.service.js';
+import { JwtPayload } from '../types/auth.js';
 import { Role } from '@prisma/client';
 import { z } from 'zod';
-import { RegisterRequestSchema } from '../schemas/registerRequest.schema';
-import { LoginRequestSchema } from '../schemas/loginRequest.schema';
-import { getJwtToken } from '../utils/jwt.util';
+import { RegisterRequestSchema } from '../schemas/registerRequest.schema.js';
+import { LoginRequestSchema } from '../schemas/loginRequest.schema.js';
+import { getJwtToken } from '../utils/jwt.util.js';
 import { v4 as uuidv4 } from 'uuid';
-import { generateVerificationEmail, generateForgotPasswordEmail } from '../utils/email.util';
+import { generateVerificationEmail, generateForgotPasswordEmail } from '../utils/email.util.js';
 
 export default class UserController {
   private userService: userService;

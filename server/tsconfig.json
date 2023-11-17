@@ -12,7 +12,7 @@
     "checkJs": false,
     "declaration": true,
     "declarationMap": true,
-    "emitDeclarationOnly": true,
+    "emitDeclarationOnly": false,
     "sourceMap": true,
     "paths": {
       "@src/*": ["src/*"]
