@@ -13,7 +13,11 @@ app.use(
     origin: '*',
   })
 );
-
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'success',
+  });
+});
 // Middleware to log incoming requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
