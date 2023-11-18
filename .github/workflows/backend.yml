@@ -51,7 +51,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: bizconnect-backend-task-definitions.json
+          task-definition: ./server/bizconnect-backend-task-definitions.json
           container-name: backend
           image: ${{ steps.build-image.outputs.image }}
       - name: Deploy Amazon ECS task definition
