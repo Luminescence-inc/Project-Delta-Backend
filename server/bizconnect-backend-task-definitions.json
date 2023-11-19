@@ -1,9 +1,9 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:ca-central-1:615030762552:task-definition/bizconnect-backend-task-definitions:2",
+  "taskDefinitionArn": "arn:aws:ecs:ca-central-1:615030762552:task-definition/bizconnect-backend-task-definitions:7",
   "containerDefinitions": [
     {
       "name": "backend",
-      "image": "615030762552.dkr.ecr.ca-central-1.amazonaws.com/backend:v0.1.9",
+      "image": "615030762552.dkr.ecr.ca-central-1.amazonaws.com/backend:v0.1.13",
       "cpu": 0,
       "portMappings": [
         {
@@ -35,7 +35,7 @@
   "family": "bizconnect-backend-task-definitions",
   "taskRoleArn": "arn:aws:iam::615030762552:role/ecs-role-to-access-rds",
   "executionRoleArn": "arn:aws:iam::615030762552:role/ecsTaskExecutionRole",
-  "revision": 2,
+  "revision": 7,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -73,7 +73,7 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2023-11-18T21:32:06.255Z",
+  "registeredAt": "2023-11-18T23:05:53.401Z",
   "registeredBy": "arn:aws:iam::615030762552:user/cwokpala",
   "tags": []
 }
