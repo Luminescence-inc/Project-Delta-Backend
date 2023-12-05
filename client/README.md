@@ -1,3 +1,0 @@
-<!-- @format -->
-
-# BizConnect FE
