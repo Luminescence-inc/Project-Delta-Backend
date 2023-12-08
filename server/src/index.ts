@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import userRoute from './routes/user.route.js';
+import userRoute from './routes/user.route';
+import businessRoute from './routes/business.route';
 
 const app = express();
 const port = process.env.PORT || 5005;
@@ -18,6 +19,7 @@ app.get('/', (req, res) => {
     message: 'success',
   });
 });
+
 // Middleware to log incoming requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -27,6 +29,7 @@ app.use((req, res, next) => {
 });
 
 app.use(userRoute);
+app.use(businessRoute);
 
 app.listen(port, () => {
   console.log(`⚡️[Server]: biz-portal-api is running at http://localhost:${port}`);

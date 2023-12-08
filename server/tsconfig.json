@@ -4,7 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "lib": ["ES2022"],
     "module": "ES2022",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "node",
     "outDir": "./dist" /* Specify an output folder for all emitted files. */,
     "rootDir": ".",
     "baseUrl": ".",
@@ -19,7 +19,6 @@
     },
     "removeComments": true /* Disable emitting comments. */,
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables */,
-
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
     "strict": true /* Enable all strict type-checking options. */,
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
