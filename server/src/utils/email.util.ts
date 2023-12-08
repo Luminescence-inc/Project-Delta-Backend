@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-const clientBaseUrl = process.env.CLIENT_BASE_URL;
+const currenturl = "http://localhost:5005/api/"; //env: client url for password reset and/or verification email
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -17,8 +17,8 @@ export const generateVerificationEmail = (userId: string, userEmail: string, uni
         from: process.env.AUTH_EMAIL,
         to: userEmail,
         subject: "Verify Your Email",
-        html: `<p>Verify your email address to complete your profile.</p><p>This link <b>expires in ${Math.round((date - currentTime)/(1000*60*60))} hours</b>.</p>
-        <p>Click <a href=${clientBaseUrl + "/verify-email/" + userId + "/" + uniqueString}>here</a></p>`
+        html: `<p>Verify your email address to complete your profile.</p><p>This link <b>expires in ${(date - currentTime)/(1000*60*60)} hours</b>.</p>
+        <p>Click <a href=${currenturl + "user/verify/" + userId + "/" + uniqueString}>here</a></p>`
     };
 
     return transporter.sendMail(mailOptions)
@@ -31,8 +31,8 @@ export const generateForgotPasswordEmail = (userId: string, userEmail: string, u
         from: process.env.AUTH_EMAIL,
         to: userEmail,
         subject: "Reset Your Password",
-        html: `<p>Click this link to Reset your password.</p><p>This link <b>expires in ${Math.round((date - currentTime)/(1000*60*60))} hours</b>.</p>
-        <p>Click <a href=${clientBaseUrl + "/forgot-password/reset/" + userId + "/" + uniqueString}>here</a></p>`
+        html: `<p>Click this link to Reset your password.</p><p>This link <b>expires in ${(date - currentTime)/(1000*60*60)} hours</b>.</p>
+        <p>Click <a href=${currenturl + "user/reset_password/" + userId + "/" + uniqueString}>here</a></p>`
     };
 
     return transporter.sendMail(mailOptions)
