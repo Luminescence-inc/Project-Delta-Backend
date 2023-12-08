@@ -1,7 +1,7 @@
 import jwt from 'passport-jwt';
 import { JwtPayload } from '../types/auth.js';
 import passport from 'passport';
-import prisma from '../utils/prisma.client';
+import prisma from '../utils/prisma.client.js';
 
 const JwtStrategy = jwt.Strategy;
 const ExtractJwt = jwt.ExtractJwt;

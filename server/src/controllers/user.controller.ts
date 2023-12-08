@@ -8,9 +8,10 @@ import { RegisterRequestSchema } from '../schemas/registerRequest.schema.js';
 import { LoginRequestSchema } from '../schemas/loginRequest.schema.js';
 import { getJwtToken, jwtTokenSecret } from '../utils/jwt.util.js';
 import { v4 as uuidv4 } from 'uuid';
-import { generateVerificationEmail, generateForgotPasswordEmail } from '@src/utils/email.util.js';
+import { generateVerificationEmail, generateForgotPasswordEmail } from '../utils/email.util.js';
+
 import jwtToken from 'jsonwebtoken';
-import SendResponse from '@src/utils/response.util';
+import SendResponse from '../utils/response.util.js';
 
 export default class UserController {
   private userService: userService;
