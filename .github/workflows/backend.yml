@@ -1,8 +1,8 @@
 ---
 name: build and push backend to AWS ECR
 on:
-  push:
-    branches: [feature/TEC-27/create-gitHub-script-for-ci-cd-backend]
+  pull_request:
+    branches: [dev]
 jobs:
   build-and-push:
     name: Build and Push to ECR
