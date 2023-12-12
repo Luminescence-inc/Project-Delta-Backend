@@ -41,6 +41,7 @@ jobs:
           echo JWT_TOKEN_SECRET=${{secrets.JWT_TOKEN_SECRET}} >> .env
           echo AUTH_EMAIL=${{secrets.AUTH_EMAIL}} >> .env
           echo JWT_TOKEN_SECRET_EXP=${{secrets.JWT_TOKEN_SECRET_EXP}} >> .env
+          echo CLIENT_BASE_URL=${{secrets.CLIENT_BASE_URL}} >> .env
           echo AUTH_PASS=${{secrets.AUTH_PASS}} >> .env
           cat .env
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
