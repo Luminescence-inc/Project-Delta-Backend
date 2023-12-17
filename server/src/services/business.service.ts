@@ -77,11 +77,10 @@ export default class businessService {
     });
   }
 
-  async findBusinessProfileById(uuid: string, userUuid: string) {
+  async findBusinessProfileById(uuid: string) {
     return await prisma.business_profiles.findFirst({
       where: {
-        uuid,
-        userUuid,
+        uuid
       },
       include: {
         businessCategory: {

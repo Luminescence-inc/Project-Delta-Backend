@@ -7,6 +7,7 @@ import SendResponse from '../utils/response.util.js';
 import { Role } from '@prisma/client';
 import userService from '../services/user.service.js';
 import { BusinessProfileFilterField } from '../enums/business.enum.js';
+// import {v2 as cloudinary} from 'cloudinary';
 
 export default class BusinessController {
   private businessService: businessService;
@@ -166,10 +167,9 @@ export default class BusinessController {
 
   getProfile = async (req: Request, res: Response) => {
     const respond = new SendResponse(res);
-    const user: JwtPayload = req.user as JwtPayload;
     const { id } = req.params;
     try {
-      const businessProfile = await this.businessService.findBusinessProfileById(id, user.id);
+      const businessProfile = await this.businessService.findBusinessProfileById(id);
       return respond
         .status(200)
         .success(true)
@@ -223,4 +223,32 @@ export default class BusinessController {
       return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
     }
   };
+
+  // getUploadSignature = async (req: Request, res: Response) => {
+  //   const respond = new SendResponse(res);
+  //   const cloudinaryConfig = cloudinary.config({
+  //     cloud_name: process.env.CLOUDINARY_NAME,
+  //     api_key: process.env.CLOUDINARY_API_KEY,
+  //     api_secret: process.env.CLOUDINARY_SECRET,
+  //     secure: true
+  //   })
+
+  //   const timestamp = Math.round(new Date().getTime() / 1000)
+    
+  //   const signature = cloudinary.utils.api_sign_request(
+  //     {
+  //       timestamp: timestamp,
+  //       folder: "BizConnect/Logo/d1d5f052-f390-4876-bf14-0789cac256c5"
+  //     },
+  //     cloudinaryConfig.api_secret as string
+  //   )
+
+  //   return respond
+  //     .status(200)
+  //     .success(true)
+  //     .code(200)
+  //     .desc(`All Business Categories`)
+  //     .responseData({ timestamp, signature })
+  //     .send();
+  // }
 }

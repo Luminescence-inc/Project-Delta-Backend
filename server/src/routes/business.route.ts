@@ -40,8 +40,6 @@ router.get(
 
 router.get(
   '/api/business_profile/list/:id',
-  passport.authenticate('jwt', { session: false }),
-  validate(AuthRequestSchema),
   businessController.getProfile
 );
 
@@ -52,11 +50,17 @@ router.delete(
   businessController.deleteProfile
 );
 
+// Both Customers and Business Owners have access to this endpoint
 router.get(
   '/api/business_profile/categories',
-  passport.authenticate('jwt', { session: false }),
-  validate(AuthRequestSchema),
   businessController.getBusinessCategories
 );
+
+// router.get(
+//   '/api/business_profile/upload_signature',
+//   passport.authenticate('jwt', { session: false }),
+//   validate(AuthRequestSchema),
+//   businessController.getUploadSignature
+// );
 
 export default router;
