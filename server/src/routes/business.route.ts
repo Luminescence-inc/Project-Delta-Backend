@@ -56,11 +56,11 @@ router.get(
   businessController.getBusinessCategories
 );
 
-// router.get(
-//   '/api/business_profile/upload_signature',
-//   passport.authenticate('jwt', { session: false }),
-//   validate(AuthRequestSchema),
-//   businessController.getUploadSignature
-// );
+router.get(
+  '/api/business_profile/upload_signature',
+  passport.authenticate('jwt', { session: false }),
+  validate(AuthRequestSchema),
+  businessController.getUploadSignature
+);
 
 export default router;

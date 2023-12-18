@@ -7,15 +7,23 @@ import SendResponse from '../utils/response.util.js';
 import { Role } from '@prisma/client';
 import userService from '../services/user.service.js';
 import { BusinessProfileFilterField } from '../enums/business.enum.js';
-// import {v2 as cloudinary} from 'cloudinary';
+import {ConfigOptions, v2 as cloudinary} from 'cloudinary';
 
 export default class BusinessController {
   private businessService: businessService;
   private userService: userService;
+  private cloudinaryConfig: ConfigOptions;
 
   constructor() {
     this.businessService = new businessService();
     this.userService = new userService();
+
+    this.cloudinaryConfig = cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_SECRET,
+      secure: true
+    })
   }
 
   searchBusinessProfile = async (req: Request, res: Response) => {
@@ -99,6 +107,22 @@ export default class BusinessController {
     const user: JwtPayload = req.user as JwtPayload;
 
     try {
+      // Check Logo Signature
+      if(profileBody?.version && profileBody?.signature && profileBody?.publicId){
+        try {
+          const expectedSignature = cloudinary.utils.api_sign_request({ public_id: profileBody?.publicId, version: profileBody.version }, this.cloudinaryConfig.api_secret as string)
+          if (expectedSignature === profileBody?.signature) {
+            profileBody["logoUrl"] = profileBody.publicId as string
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      delete profileBody.version;
+      delete profileBody.signature;
+      delete profileBody.publicId;
+
       // remove empty or null values
       const filteredProfileBody: BusinessCreationBody = removeEmptyOrNullKeyValues(profileBody);
       const businessProfile = await this.businessService.createBusinessProfile(user.id, filteredProfileBody);
@@ -118,6 +142,7 @@ export default class BusinessController {
       console.error(error);
       return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
     }
+
   };
 
   updateBusinessProfile = async (req: Request, res: Response) => {
@@ -224,31 +249,25 @@ export default class BusinessController {
     }
   };
 
-  // getUploadSignature = async (req: Request, res: Response) => {
-  //   const respond = new SendResponse(res);
-  //   const cloudinaryConfig = cloudinary.config({
-  //     cloud_name: process.env.CLOUDINARY_NAME,
-  //     api_key: process.env.CLOUDINARY_API_KEY,
-  //     api_secret: process.env.CLOUDINARY_SECRET,
-  //     secure: true
-  //   })
+  getUploadSignature = async (req: Request, res: Response) => {
+    const { folderName } = req.query;
+    const respond = new SendResponse(res);
 
-  //   const timestamp = Math.round(new Date().getTime() / 1000)
-    
-  //   const signature = cloudinary.utils.api_sign_request(
-  //     {
-  //       timestamp: timestamp,
-  //       folder: "BizConnect/Logo/d1d5f052-f390-4876-bf14-0789cac256c5"
-  //     },
-  //     cloudinaryConfig.api_secret as string
-  //   )
+    const timestamp = Math.round(new Date().getTime() / 1000)
+    const signature = cloudinary.utils.api_sign_request(
+      {
+        timestamp: timestamp,
+        folder: folderName
+      },
+      this.cloudinaryConfig.api_secret as string
+    )
 
-  //   return respond
-  //     .status(200)
-  //     .success(true)
-  //     .code(200)
-  //     .desc(`All Business Categories`)
-  //     .responseData({ timestamp, signature })
-  //     .send();
-  // }
+    return respond
+      .status(200)
+      .success(true)
+      .code(200)
+      .desc(`All Business Categories`)
+      .responseData({ timestamp, signature })
+      .send();
+  }
 }

@@ -19,6 +19,9 @@ export interface BusinessCreationBody {
     instagramUrl?: string;
     twitterUrl?: string;
     facebookUrl?: string;
+    publicId?: string | null;
+    version?: number | null;
+    signature?: string | null;
 }
 
 export interface BusinessSearchRequestBody {

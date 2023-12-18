@@ -21,7 +21,6 @@ export const BusinessCreationRequestSchema = RequestSchema.extend({
     }),
     street: z.string().nullable(),
     postalCode: z.string().nullable(),
-    logoUrl: z.string().nullable(),
     phoneNumber: z.string().nullable(),
     businessEmail: z.string().nullable(),
     openTime: z.string().nullable(),
@@ -32,5 +31,8 @@ export const BusinessCreationRequestSchema = RequestSchema.extend({
     instagramUrl: z.string().nullable(),
     twitterUrl: z.string().nullable(),
     facebookUrl: z.string().nullable(),
+    publicId: z.string().nullable(),
+    version: z.number().nullable(),
+    signature: z.string().nullable(),
   }),
 });
