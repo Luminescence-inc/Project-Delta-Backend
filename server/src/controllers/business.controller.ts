@@ -118,7 +118,7 @@ export default class BusinessController {
           console.error(error)
         }
       }
-
+      // Delete key values
       delete profileBody.version;
       delete profileBody.signature;
       delete profileBody.publicId;
