@@ -8,7 +8,7 @@ export interface BusinessCreationBody {
     city?: string;
     street?: string;
     postalCode?: string;
-    logoUrl?: string;
+    logoUrl?: string | null;
     phoneNumber?: string;
     businessEmail?: string;
     openTime?: string;
@@ -22,6 +22,7 @@ export interface BusinessCreationBody {
     publicId?: string | null;
     version?: number | null;
     signature?: string | null;
+    deleteLogo?: boolean;
 }
 
 export interface BusinessSearchRequestBody {
