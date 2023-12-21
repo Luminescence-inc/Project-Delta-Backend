@@ -34,5 +34,7 @@ export const BusinessCreationRequestSchema = RequestSchema.extend({
     publicId: z.string().nullable(),
     version: z.number().nullable(),
     signature: z.string().nullable(),
+    logoUrl: z.string().nullable(),
+    deleteLogo: z.boolean()
   }),
 });

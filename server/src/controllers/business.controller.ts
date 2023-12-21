@@ -122,6 +122,7 @@ export default class BusinessController {
       delete profileBody.version;
       delete profileBody.signature;
       delete profileBody.publicId;
+      delete profileBody.deleteLogo;
 
       // remove empty or null values
       const filteredProfileBody: BusinessCreationBody = removeEmptyOrNullKeyValues(profileBody);
@@ -152,6 +153,42 @@ export default class BusinessController {
     const { id } = req.params;
 
     try {
+      const previousLogoUrl = profileBody.logoUrl as string;
+      let deletePreviousLogo = profileBody.deleteLogo as boolean;
+      let updateLogo = false;
+
+      // Check Logo Signature
+      if(profileBody?.version && profileBody?.signature && profileBody?.publicId){
+        try {
+          const expectedSignature = cloudinary.utils.api_sign_request({ public_id: profileBody?.publicId, version: profileBody.version }, this.cloudinaryConfig.api_secret as string)
+          if (expectedSignature === profileBody?.signature) {
+            profileBody["logoUrl"] = profileBody.publicId as string
+            deletePreviousLogo = true;
+            updateLogo = true;
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+      // Delete key values
+      delete profileBody.version;
+      delete profileBody.signature;
+      delete profileBody.publicId;
+
+      // Delete old Logo
+      if(deletePreviousLogo){
+        try {
+          cloudinary.uploader.destroy(previousLogoUrl)
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      if(deletePreviousLogo && !updateLogo){
+        profileBody["logoUrl"] = null;
+      }
+      delete profileBody.deleteLogo;
+
       //standerdize empty string
       const filteredProfileBody = standardizeEmptyKeyValues(profileBody);
       const updatedBusinessProfile = await this.businessService.updateBusinessProfileById(
