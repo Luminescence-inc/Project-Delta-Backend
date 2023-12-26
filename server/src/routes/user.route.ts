@@ -5,7 +5,7 @@ import { validate } from '../middleware/validate.js';
 import { RegisterRequestSchema } from '../schemas/registerRequest.schema.js';
 import { LoginRequestSchema } from '../schemas/loginRequest.schema.js';
 import { AuthRequestSchema } from '../schemas/request.schema.js';
-import { UpdateUserDetailsSchema } from '@src/schemas/updateUserDetails.schema.js';
+import { UpdateUserDetailsSchema } from '../schemas/updateUserDetails.schema.js';
 
 const router = Router();
 const userController = new UserController();
