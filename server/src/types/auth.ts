@@ -11,6 +11,12 @@ export interface JwtPayload {
     exp?: number;
 }
 
+export interface UpdateUserDetailsRequest {
+    firstName: string;
+    lastName: string;
+    password: string;
+}
+
 export interface BaseResponseMessage {
     success: boolean | null;
     message: BaseMessage;

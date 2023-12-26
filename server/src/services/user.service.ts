@@ -15,6 +15,36 @@ export default class userService {
     });
   }
 
+  async updateUserDetails (useruuid: string, firstName: string | null, lastName: string | null, password: string | null) {
+    
+    let data: Record<string, string> = {}
+    
+    if(firstName){
+      data['firstName'] = firstName;
+    }
+
+    if(lastName){
+      data['lastName'] = lastName;
+    }
+
+    if(password){
+      data['password'] = password;
+    }
+
+    return await prisma.user.update({
+      where: { uuid: useruuid },
+      data,
+      select: {
+        uuid: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        verified: true
+      }
+    });
+  }
+
   async createUserVerification(
     useruuid: string,
     hashedUniqueString: string,
@@ -58,6 +88,22 @@ export default class userService {
     return await prisma.user.findFirst({
       where: {
         email,
+      },
+    });
+  }
+
+  async findUserById(uuid: string) {
+    return await prisma.user.findFirst({
+      where: {
+        uuid,
+      },
+      select: {
+        uuid: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        verified: true
       },
     });
   }

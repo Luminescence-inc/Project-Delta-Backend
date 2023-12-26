@@ -5,11 +5,16 @@ import { validate } from '../middleware/validate.js';
 import { RegisterRequestSchema } from '../schemas/registerRequest.schema.js';
 import { LoginRequestSchema } from '../schemas/loginRequest.schema.js';
 import { AuthRequestSchema } from '../schemas/request.schema.js';
+import { UpdateUserDetailsSchema } from '@src/schemas/updateUserDetails.schema.js';
 
 const router = Router();
 const userController = new UserController();
 
 router.post('/api/user/register', validate(RegisterRequestSchema), userController.registerUser);
+
+router.get('/api/user/details', passport.authenticate('jwt', { session: false }), userController.getUserDetails);
+
+router.post('/api/user/details/update', passport.authenticate('jwt', { session: false }), validate(UpdateUserDetailsSchema), userController.updateUserDetails);
 
 router.post('/api/user/login', validate(LoginRequestSchema), userController.loginUser);
 
