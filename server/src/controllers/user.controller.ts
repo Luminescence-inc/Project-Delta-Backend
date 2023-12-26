@@ -1,12 +1,12 @@
 import { Response } from 'express';
 import { hashSync, compareSync } from 'bcrypt';
 import userService from '../services/user.service.js';
-import { JwtPayload } from '../types/auth.js';
+import { JwtPayload, UpdateUserDetailsRequest } from '../types/auth.js';
 import { Role, VerificationType } from '@prisma/client';
 import { z } from 'zod';
 import { RegisterRequestSchema } from '../schemas/registerRequest.schema.js';
 import { LoginRequestSchema } from '../schemas/loginRequest.schema.js';
-import { getJwtToken, jwtTokenSecret } from '../utils/jwt.util.js';
+import { getJwtToken, jwtTokenSecret, standardizeEmptyKeyValues } from '../utils/jwt.util.js';
 import { v4 as uuidv4 } from 'uuid';
 import { generateVerificationEmail, generateForgotPasswordEmail } from '../utils/email.util.js';
 
@@ -77,6 +77,47 @@ export default class UserController {
       return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
     }
   };
+
+  getUserDetails = async (req: any, res: Response) =>{
+    const respond = new SendResponse(res);
+    const user: JwtPayload = req.user as JwtPayload;
+    try {
+      const userDetails = await this.userService.findUserById(user.id);
+      return respond
+        .status(200)
+        .success(true)
+        .code(200)
+        .desc('User Details')
+        .responseData({ userDetails })
+        .send();
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  updateUserDetails = async (req: any, res: Response) => {
+    const respond = new SendResponse(res);
+    const updatedDetails: UpdateUserDetailsRequest = req.body;
+    const user: JwtPayload = req.user as JwtPayload;
+    const filteredDetails = standardizeEmptyKeyValues(updatedDetails);
+
+    try {
+      const updatedUser = await this.userService.updateUserDetails(user.id, 
+        filteredDetails.firstName, 
+        filteredDetails.lastName, 
+        filteredDetails.password?hashSync(filteredDetails.password, 10):null) // env: salt for password
+      
+      return respond
+        .status(200)
+        .success(true)
+        .code(200)
+        .desc('User Details updated')
+        .responseData({ updatedUser })
+        .send();
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   loginUser = async (req: z.infer<typeof LoginRequestSchema>, res: Response) => {
     const respond = new SendResponse(res);
