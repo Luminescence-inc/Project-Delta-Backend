@@ -23,12 +23,13 @@ export const generateVerificationEmail = (userId: string, userEmail: string, uni
         link: `${clientBaseUrl + "/verify-email/" + userId + "/" + uniqueString}`
     }
     const htmlToSend = template(replacements);
+    const ht = htmlToSend
     const mailOptions = {
         from: process.env.AUTH_EMAIL,
         to: userEmail,
         subject: "Verify Your Email",
         text: 'Verification Email',
-        html: htmlToSend
+        html: ht
     };
 
     return transporter.sendMail(mailOptions)
