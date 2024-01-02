@@ -1,6 +1,10 @@
 import nodemailer from "nodemailer";
+import handlebars from "handlebars";
+import fs from "fs";
 
 const clientBaseUrl = process.env.CLIENT_BASE_URL;
+const source = fs.readFileSync('src/templates/email_template.html', 'utf-8').toString();
+const template = handlebars.compile(source);
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -13,12 +17,18 @@ const transporter = nodemailer.createTransport({
 export const generateVerificationEmail = (userId: string, userEmail: string, uniqueString: string, expiresUtc: number)=>{
     const date:any = new Date(expiresUtc);
     const currentTime:any = new Date();
+    const replacements = {
+        title: 'Account Verification Email',
+        content: `Please click on the link below to verify your account and complete registration. Link will expire in ${Math.round((date - currentTime)/(1000*60*60))} hours`,
+        link: `${clientBaseUrl + "/verify-email/" + userId + "/" + uniqueString}`
+    }
+    const htmlToSend = template(replacements);
     const mailOptions = {
         from: process.env.AUTH_EMAIL,
         to: userEmail,
         subject: "Verify Your Email",
-        html: `<p>Verify your email address to complete your profile.</p><p>This link <b>expires in ${Math.round((date - currentTime)/(1000*60*60))} hours</b>.</p>
-        <p>Click <a href=${clientBaseUrl + "/verify-email/" + userId + "/" + uniqueString}>here</a></p>`
+        text: 'Verification Email',
+        html: htmlToSend
     };
 
     return transporter.sendMail(mailOptions)
@@ -27,12 +37,18 @@ export const generateVerificationEmail = (userId: string, userEmail: string, uni
 export const generateForgotPasswordEmail = (userId: string, userEmail: string, uniqueString: string, expiresUtc: number)=>{
     const date:any = new Date(expiresUtc);
     const currentTime:any = new Date();
+    const replacements = {
+        title: 'Reset Password Email',
+        content: `Please click on the link below to Reset your password. Link will expire in ${Math.round((date - currentTime)/(1000*60*60))} hours`,
+        link: `${clientBaseUrl + "/forgot-password/reset/" + userId + "/" + uniqueString}`
+    }
+    const htmlToSend = template(replacements);
     const mailOptions = {
         from: process.env.AUTH_EMAIL,
         to: userEmail,
         subject: "Reset Your Password",
-        html: `<p>Click this link to Reset your password.</p><p>This link <b>expires in ${Math.round((date - currentTime)/(1000*60*60))} hours</b>.</p>
-        <p>Click <a href=${clientBaseUrl + "/forgot-password/reset/" + userId + "/" + uniqueString}>here</a></p>`
+        text: 'Reste Password Email',
+        html: htmlToSend
     };
 
     return transporter.sendMail(mailOptions)
