@@ -1,7 +1,7 @@
 ---
 name: build and push backend to AWS ECR
 on:
-  pull_request:
+  push:
     branches: [dev]
 jobs:
   build-and-push:
