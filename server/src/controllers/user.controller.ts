@@ -19,7 +19,7 @@ export default class UserController {
   constructor() {
     this.userService = new userService();
   }
-
+  // this is needed to register users
   registerUser = async (req: z.infer<typeof RegisterRequestSchema>, res: Response) => {
     const respond = new SendResponse(res);
     const { firstName, lastName, email, password } = req.body;
@@ -78,22 +78,16 @@ export default class UserController {
     }
   };
 
-  getUserDetails = async (req: any, res: Response) =>{
+  getUserDetails = async (req: any, res: Response) => {
     const respond = new SendResponse(res);
     const user: JwtPayload = req.user as JwtPayload;
     try {
       const userDetails = await this.userService.findUserById(user.id);
-      return respond
-        .status(200)
-        .success(true)
-        .code(200)
-        .desc('User Details')
-        .responseData({ userDetails })
-        .send();
+      return respond.status(200).success(true).code(200).desc('User Details').responseData({ userDetails }).send();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   updateUserDetails = async (req: any, res: Response) => {
     const respond = new SendResponse(res);
@@ -102,11 +96,13 @@ export default class UserController {
     const filteredDetails = standardizeEmptyKeyValues(updatedDetails);
 
     try {
-      const updatedUser = await this.userService.updateUserDetails(user.id, 
-        filteredDetails.firstName, 
-        filteredDetails.lastName, 
-        filteredDetails.password?hashSync(filteredDetails.password, 10):null) // env: salt for password
-      
+      const updatedUser = await this.userService.updateUserDetails(
+        user.id,
+        filteredDetails.firstName,
+        filteredDetails.lastName,
+        filteredDetails.password ? hashSync(filteredDetails.password, 10) : null
+      ); // env: salt for password
+
       return respond
         .status(200)
         .success(true)
@@ -117,7 +113,7 @@ export default class UserController {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   loginUser = async (req: z.infer<typeof LoginRequestSchema>, res: Response) => {
     const respond = new SendResponse(res);
