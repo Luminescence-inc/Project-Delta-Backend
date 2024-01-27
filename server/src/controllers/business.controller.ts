@@ -7,7 +7,8 @@ import SendResponse from '../utils/response.util.js';
 import { Role } from '@prisma/client';
 import userService from '../services/user.service.js';
 import { BusinessProfileFilterField } from '../enums/business.enum.js';
-import {ConfigOptions, v2 as cloudinary} from 'cloudinary';
+import { ConfigOptions, v2 as cloudinary } from 'cloudinary';
+import { generateSupportEmail } from '@src/utils/email.util.js';
 
 export default class BusinessController {
   private businessService: businessService;
@@ -22,8 +23,8 @@ export default class BusinessController {
       cloud_name: process.env.CLOUDINARY_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
       api_secret: process.env.CLOUDINARY_SECRET,
-      secure: true
-    })
+      secure: true,
+    });
   }
 
   searchBusinessProfile = async (req: Request, res: Response) => {
@@ -108,14 +109,17 @@ export default class BusinessController {
 
     try {
       // Check Logo Signature
-      if(profileBody?.version && profileBody?.signature && profileBody?.publicId){
+      if (profileBody?.version && profileBody?.signature && profileBody?.publicId) {
         try {
-          const expectedSignature = cloudinary.utils.api_sign_request({ public_id: profileBody?.publicId, version: profileBody.version }, this.cloudinaryConfig.api_secret as string)
+          const expectedSignature = cloudinary.utils.api_sign_request(
+            { public_id: profileBody?.publicId, version: profileBody.version },
+            this.cloudinaryConfig.api_secret as string
+          );
           if (expectedSignature === profileBody?.signature) {
-            profileBody["logoUrl"] = profileBody.publicId as string
+            profileBody['logoUrl'] = profileBody.publicId as string;
           }
         } catch (error) {
-          console.error(error)
+          console.error(error);
         }
       }
       // Delete key values
@@ -143,7 +147,6 @@ export default class BusinessController {
       console.error(error);
       return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
     }
-
   };
 
   updateBusinessProfile = async (req: Request, res: Response) => {
@@ -158,16 +161,19 @@ export default class BusinessController {
       let updateLogo = false;
 
       // Check Logo Signature
-      if(profileBody?.version && profileBody?.signature && profileBody?.publicId){
+      if (profileBody?.version && profileBody?.signature && profileBody?.publicId) {
         try {
-          const expectedSignature = cloudinary.utils.api_sign_request({ public_id: profileBody?.publicId, version: profileBody.version }, this.cloudinaryConfig.api_secret as string)
+          const expectedSignature = cloudinary.utils.api_sign_request(
+            { public_id: profileBody?.publicId, version: profileBody.version },
+            this.cloudinaryConfig.api_secret as string
+          );
           if (expectedSignature === profileBody?.signature) {
-            profileBody["logoUrl"] = profileBody.publicId as string
+            profileBody['logoUrl'] = profileBody.publicId as string;
             deletePreviousLogo = true;
             updateLogo = true;
           }
         } catch (error) {
-          console.error(error)
+          console.error(error);
         }
       }
       // Delete key values
@@ -176,16 +182,16 @@ export default class BusinessController {
       delete profileBody.publicId;
 
       // Delete old Logo
-      if(deletePreviousLogo){
+      if (deletePreviousLogo) {
         try {
-          cloudinary.uploader.destroy(previousLogoUrl)
+          cloudinary.uploader.destroy(previousLogoUrl);
         } catch (error) {
-          console.error(error)
+          console.error(error);
         }
       }
 
-      if(deletePreviousLogo && !updateLogo){
-        profileBody["logoUrl"] = null;
+      if (deletePreviousLogo && !updateLogo) {
+        profileBody['logoUrl'] = null;
       }
       delete profileBody.deleteLogo;
 
@@ -290,14 +296,14 @@ export default class BusinessController {
     const { folderName } = req.query;
     const respond = new SendResponse(res);
 
-    const timestamp = Math.round(new Date().getTime() / 1000)
+    const timestamp = Math.round(new Date().getTime() / 1000);
     const signature = cloudinary.utils.api_sign_request(
       {
         timestamp: timestamp,
-        folder: folderName
+        folder: folderName,
       },
       this.cloudinaryConfig.api_secret as string
-    )
+    );
 
     return respond
       .status(200)
@@ -306,5 +312,14 @@ export default class BusinessController {
       .desc(`All Business Categories`)
       .responseData({ timestamp, signature })
       .send();
-  }
+  };
+
+  contactSupport = async (req: Request, res: Response) => {
+    const { personName, email, phoneNumber, problemDescription } = req.body;
+    const respond = new SendResponse(res);
+    await generateSupportEmail(personName, email, phoneNumber, problemDescription)
+      .then(() => console.info(`User complaint sent to - bizconnect24.help@gmail.com`))
+      .catch(err => console.error(`User complaint email failed with error message - ${err}`));
+    return respond.status(200).success(true).code(200).desc('You Complaint has been sent ').send();
+  };
 }

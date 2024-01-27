@@ -31,6 +31,8 @@ router.post(
   businessController.searchBusinessProfile
 );
 
+router.post('/api/business_profile/contact', businessController.contactSupport);
+
 router.get(
   '/api/business_profile/list',
   passport.authenticate('jwt', { session: false }),
@@ -38,10 +40,7 @@ router.get(
   businessController.listAllProfiles
 );
 
-router.get(
-  '/api/business_profile/list/:id',
-  businessController.getProfile
-);
+router.get('/api/business_profile/list/:id', businessController.getProfile);
 
 router.delete(
   '/api/business_profile/delete/:id',
@@ -51,10 +50,7 @@ router.delete(
 );
 
 // Both Customers and Business Owners have access to this endpoint
-router.get(
-  '/api/business_profile/categories',
-  businessController.getBusinessCategories
-);
+router.get('/api/business_profile/categories', businessController.getBusinessCategories);
 
 router.get(
   '/api/business_profile/upload_signature',
