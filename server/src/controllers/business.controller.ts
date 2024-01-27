@@ -26,7 +26,7 @@ export default class BusinessController {
       secure: true,
     });
   }
-
+  // this is used for searching profile
   searchBusinessProfile = async (req: Request, res: Response) => {
     const respond = new SendResponse(res);
     const searchBody: BusinessSearchRequestBody = req.body;
