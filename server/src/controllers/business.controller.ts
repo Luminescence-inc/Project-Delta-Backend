@@ -8,7 +8,7 @@ import { Role } from '@prisma/client';
 import userService from '../services/user.service.js';
 import { BusinessProfileFilterField } from '../enums/business.enum.js';
 import { ConfigOptions, v2 as cloudinary } from 'cloudinary';
-import { generateSupportEmail } from '@src/utils/email.util.js';
+import { generateSupportEmail } from '../utils/email.util.js';
 
 export default class BusinessController {
   private businessService: businessService;
