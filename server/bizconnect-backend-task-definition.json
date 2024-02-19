@@ -1,9 +1,9 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:ca-central-1:615030762552:task-definition/bizconnect-backend-task-definitions:7",
+  "taskDefinitionArn": "arn:aws:ecs:ca-central-1:891377098991:task-definition/bizconnect-backend-task-definition:2",
   "containerDefinitions": [
     {
       "name": "backend",
-      "image": "615030762552.dkr.ecr.ca-central-1.amazonaws.com/backend:v0.1.13",
+      "image": "891377098991.dkr.ecr.ca-central-1.amazonaws.com/backend:latest",
       "cpu": 0,
       "portMappings": [
         {
@@ -24,7 +24,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-create-group": "true",
-          "awslogs-group": "/ecs/bizconnect-backend-task-definitions",
+          "awslogs-group": "/ecs/bizconnect-backend-task-definition",
           "awslogs-region": "ca-central-1",
           "awslogs-stream-prefix": "ecs"
         },
@@ -32,10 +32,10 @@
       }
     }
   ],
-  "family": "bizconnect-backend-task-definitions",
-  "taskRoleArn": "arn:aws:iam::615030762552:role/ecs-role-to-access-rds",
-  "executionRoleArn": "arn:aws:iam::615030762552:role/ecsTaskExecutionRole",
-  "revision": 7,
+  "family": "bizconnect-backend-task-definition",
+  "taskRoleArn": "arn:aws:iam::891377098991:role/role_for_ecs_task_to_have_access_to_rds",
+  "executionRoleArn": "arn:aws:iam::891377098991:role/ecsTaskExecutionRole",
+  "revision": 2,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -68,12 +68,12 @@
   "compatibilities": ["EC2"],
   "requiresCompatibilities": ["EC2"],
   "cpu": "1024",
-  "memory": "900",
+  "memory": "990",
   "runtimePlatform": {
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2023-11-18T23:05:53.401Z",
-  "registeredBy": "arn:aws:iam::615030762552:user/cwokpala",
+  "registeredAt": "2024-02-19T15:53:34.287Z",
+  "registeredBy": "arn:aws:iam::891377098991:root",
   "tags": []
 }

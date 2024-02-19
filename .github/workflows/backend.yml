@@ -1,12 +1,17 @@
 ---
 name: build and push backend to AWS ECR
 on:
+  push:
+    branches: ["feature/TEC-50/new-aws-account-creation"]
   pull_request:
     branches: [dev]
 jobs:
   build-and-push:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
+    environment:
+      name: dev
+      url: https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/BizConnectDevCluster/services?region=ca-central-1
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -25,7 +30,7 @@ jobs:
       - name: Automatic tagging of Releases
         id: increment-git-tag
         run: |
-          bash ./server/git_update.sh -v patch
+          bash ./server/git_update.sh -v major
 
       - name: Build, Tag and push the image to Amazon ECR
         working-directory: ./server
@@ -55,13 +60,13 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ./server/bizconnect-backend-task-definitions.json
+          task-definition: ./server/bizconnect-backend-task-definition.json
           container-name: backend
           image: ${{ steps.build-image.outputs.image }}
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: bizconnect-serve
+          service: bizconnect-dev-service
           cluster: BizConnectDevCluster
           wait-for-service-stability: true
