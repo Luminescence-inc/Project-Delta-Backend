@@ -67,6 +67,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: bizconnect-dev-service
-          cluster: BizConnectDevCluster
+          service: bizconnect-dev-serve
+          cluster: devBizConnect
           wait-for-service-stability: true

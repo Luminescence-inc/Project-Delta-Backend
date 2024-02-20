@@ -23,6 +23,7 @@ export default class UserController {
   registerUser = async (req: z.infer<typeof RegisterRequestSchema>, res: Response) => {
     const respond = new SendResponse(res);
     const { firstName, lastName, email, password } = req.body;
+    console.log(firstName);
 
     try {
       const isEmailPresent = await this.userService.isEmailPresent(email);
