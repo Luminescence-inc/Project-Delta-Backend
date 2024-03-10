@@ -2,7 +2,7 @@
 name: build and push backend to AWS ECR
 on:
   push:
-    branches: ["feature/TEC-52/aws-prod-resources"]
+    branches: [dev]
   pull_request:
     branches: [main]
 jobs:
@@ -10,7 +10,7 @@ jobs:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
     environment:
-      name: devMain
+      name: Dev
       url: https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/BizConnectDevCluster/services?region=ca-central-1
     steps:
       - name: Checkout
