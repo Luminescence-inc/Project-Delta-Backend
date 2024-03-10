@@ -2,16 +2,16 @@
 name: build and push backend to AWS ECR
 on:
   push:
-    branches: [dev]
+    branches: ["feature/TEC-52/aws-prod-resources"]
   pull_request:
-    branches: [main]
+    branches: [dev]
 jobs:
   build-and-push:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
     environment:
       name: Dev
-      url: https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/BizConnectDevCluster/services?region=ca-central-1
+      url: https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizconnect24Cluster/services?region=ca-central-1
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -37,7 +37,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
-          ECR_REPOSITORY: backend
+          ECR_REPOSITORY: devimagerepo
           IMAGE_TAG: ${{steps.increment-git-tag.outputs.git-tag}}
         run: |
           touch .env 
@@ -60,13 +60,13 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ./server/bizconnect-backend-task-definition.json
-          container-name: backend
+          task-definition: ./server/dev-bizconnect-backend-task-definition.json
+          container-name: devimagerepo
           image: ${{ steps.build-image.outputs.image }}
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: bizconnect-dev-serve
-          cluster: devBizConnect
+          service: dev-bizconnect24-service
+          cluster: devBizconnect24Cluster
           wait-for-service-stability: true
