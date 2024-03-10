@@ -29,32 +29,52 @@ A typical product (SaaS, etc.) usually consists of following services:
 
 ## Core Structure
 
-    project delta
-      ├── backend
-      │   ├── api
-      │   │   > NodeJS
-      │   │   > PORT ####
-      │   │   > api.example.com
-      │   │
-      │   ├── database
-      │   │   > Postgres
-      │   │   > PORT ####
-      │   │
-      │   └── proxy
-      │       > NGINX
-      │       > PORT 80 / 443
-      │
-      ├── deployment
-      │   > Docker Compose
-      │
-      ├── frontend
-      │   └── app
-      │       > React
-      │       > Server side rendered
-      │       > PORT 3000
-      │       > example.com
-      │
-      └── README.md (you are here)
+ can you convert this to an image 
+React Application
+├── src
+│   ├── api
+│   │   ├── auth.js
+│   │   ├── business.js
+│   │   └── user.js
+│   ├── assets
+│   │   ├── icons
+│   │   └── images
+│   ├── components
+│   │   ├── Button
+│   │   ├── Input
+│   │   └── Spinner
+│   ├── config
+│   │   └── index.js
+│   ├── pages
+│   │   ├── Authentication
+│   │   │   ├── Login
+│   │   │   │   ├── Login.scss
+│   │   │   │   └── Login.tsx
+│   │   │   ├── Signup
+│   │   │   │   ├── Signup.scss
+│   │   │   │   └── Signup.tsx
+│   │   │   └── Verification
+│   │   │       ├── VerifyAccount.tsx
+│   │   │       └── VerifiedEmail.tsx
+│   │   ├── ContactSupport
+│   │   │   ├── ContactSupport.scss
+│   │   │   └── ContactSupport.tsx
+│   │   └── DiscoverBusinesses
+│   │       ├── BusinessCatalogue
+│   │       │   ├── FilterBusinessProfiles
+│   │       │   │   ├── FilterBusinessProfiles.scss
+│   │       │   │   └── FilterBusinessProfiles.tsx
+│   │       │   ├── BusinessCatalogue.scss
+│   │       │   └── BusinessCatalogue.tsx
+│   ├── utils
+│   │   └── helper.js
+│   ├── App.scss
+│   └── App.tsx
+├── public
+│   ├── index.html
+│   └── favicon.ico
+├── package.json
+└── README.md (you are here )
 
 ## Stack
 

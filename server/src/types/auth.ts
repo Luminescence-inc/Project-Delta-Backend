@@ -10,3 +10,20 @@ export interface JwtPayload {
     iat?: number;
     exp?: number;
 }
+
+export interface UpdateUserDetailsRequest {
+    firstName: string;
+    lastName: string;
+    password: string;
+}
+
+export interface BaseResponseMessage {
+    success: boolean | null;
+    message: BaseMessage;
+    data:   object | null;
+}
+
+export interface BaseMessage {
+    code: number | null;
+    desc: string | null;
+}
