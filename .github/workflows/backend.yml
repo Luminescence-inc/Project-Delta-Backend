@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Dev' }}
-      url: ${{ github.ref == 'refs/heads/main' && 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/BizConnectDevCluster/services?region=ca-central-1' || 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizconnect24Cluster/services?region=ca-central-1' }}
+      url: ${{ github.ref == 'refs/heads/main' && 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizConnect/services/bizconnect-dev-serve/health?region=ca-central-1' || 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizconnect24Cluster/services/dev-bizconnect24-service/health?region=ca-central-1' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -41,7 +41,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
-          ECR_REPOSITORY: backend
+          ECR_REPOSITORY: ${{ github.ref == 'refs/heads/main' && 'backend' || 'devimagerepo' }}
           IMAGE_TAG: ${{steps.increment-git-tag.outputs.git-tag}}
         run: |
           touch .env 
@@ -64,13 +64,13 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ./server/bizconnect-backend-task-definition.json
-          container-name: backend
+          task-definition: ${{ github.ref == 'refs/heads/main' && './server/bizconnect-backend-task-definition.json' || './server/dev-bizconnect-backend-task-definition.json' }}
+          container-name: ${{ github.ref == 'refs/heads/main' && 'backend' || 'devimagerepo' }}
           image: ${{ steps.build-image.outputs.image }}
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: bizconnect-dev-serve
-          cluster: devBizConnect
+          service: ${{ github.ref == 'refs/heads/main' && 'bizconnect-dev-serve' || 'dev-bizconnect24-service' }}
+          cluster: ${{ github.ref == 'refs/heads/main' && 'devBizConnect' || 'devBizconnect24Cluster' }}
           wait-for-service-stability: true
