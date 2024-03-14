@@ -2,16 +2,20 @@
 name: build and push backend to AWS ECR
 on:
   push:
-    branches: [dev]
+    branches:
+      - main
+      - dev
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - dev
 jobs:
   build-and-push:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
     environment:
-      name: Production
-      url: https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/BizConnectDevCluster/services?region=ca-central-1
+      name: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Dev' }}
+      url: ${{ github.ref == 'refs/heads/main' && 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/BizConnectDevCluster/services?region=ca-central-1' || 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizconnect24Cluster/services?region=ca-central-1' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
