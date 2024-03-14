@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Dev' }}
-      url: ${{ github.ref == 'refs/heads/main' && 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/BizConnectDevCluster/services?region=ca-central-1' || 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizconnect24Cluster/services?region=ca-central-1' }}
+      url: ${{ github.ref == 'refs/heads/main' && 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizConnect/services/bizconnect-dev-serve/health?region=ca-central-1' || 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizconnect24Cluster/services/dev-bizconnect24-service/health?region=ca-central-1' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
