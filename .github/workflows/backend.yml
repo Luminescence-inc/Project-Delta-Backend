@@ -1,0 +1,76 @@
+---
+name: build and push backend to AWS ECR
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+jobs:
+  build-and-push:
+    name: Build and Push to ECR
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Dev' }}
+      url: ${{ github.ref == 'refs/heads/main' && 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/BizConnectDevCluster/services?region=ca-central-1' || 'https://ca-central-1.console.aws.amazon.com/ecs/v2/clusters/devBizconnect24Cluster/services?region=ca-central-1' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ca-central-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Automatic tagging of Releases
+        id: increment-git-tag
+        run: |
+          bash ./server/git_update.sh -v major
+
+      - name: Build, Tag and push the image to Amazon ECR
+        working-directory: ./server
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
+          ECR_REPOSITORY: backend
+          IMAGE_TAG: ${{steps.increment-git-tag.outputs.git-tag}}
+        run: |
+          touch .env 
+          echo DATABASE_URL=${{secrets.DATABASE_URL}} >> .env
+          echo PORT=${{secrets.PORT}} >> .env
+          echo JWT_TOKEN_SECRET=${{secrets.JWT_TOKEN_SECRET}} >> .env
+          echo AUTH_EMAIL=${{secrets.AUTH_EMAIL}} >> .env
+          echo JWT_TOKEN_SECRET_EXP=${{secrets.JWT_TOKEN_SECRET_EXP}} >> .env
+          echo CLIENT_BASE_URL=${{secrets.CLIENT_BASE_URL}} >> .env
+          echo AUTH_PASS=${{secrets.AUTH_PASS}} >> .env
+          echo CLOUDINARY_NAME=${{secrets.CLOUDINARY_NAME}} >> .env
+          echo CLOUDINARY_API_KEY=${{secrets.CLOUDINARY_API_KEY}} >> .env
+          echo CLOUDINARY_SECRET=${{secrets.CLOUDINARY_SECRET}} >> .env
+          cat .env
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ./server/bizconnect-backend-task-definition.json
+          container-name: backend
+          image: ${{ steps.build-image.outputs.image }}
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: bizconnect-dev-serve
+          cluster: devBizConnect
+          wait-for-service-stability: true
