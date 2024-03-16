@@ -255,6 +255,9 @@ export default class BusinessController {
     const respond = new SendResponse(res);
     try {
       const businessCategories = await this.businessService.findAllBusinessCategories();
+      businessCategories.sort((a, b) => {
+        return a.description.localeCompare(b.description);
+      });
       return respond
         .status(200)
         .success(true)
