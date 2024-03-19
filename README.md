@@ -1,106 +1,63 @@
+# Orkestra Document Management Service
 
+## Introduction
 
-# Project-Delta
+Express based micro-service for managing user documents via Azure BLOB Storage and authentication via ADB2C.
+See [architecture here.](https://orkestra-scs.atlassian.net/wiki/spaces/PD/pages/436207639/Orkestra+2.0+Document+Management)
 
-Opinionated project architecture for Full-Stack JavaScript Applications.
+## Getting Started
 
-## About
+Pre-requisites:
 
-Using JavaScript for full-stack has always been a challenge especially with architecting various pieces of the application, choosing technologies and managing devOps. This project provides a base for typical project consisting a Landing Website, Web and Mobile Applications, API service and easy deployment of these services. This project uses a microservice architecture where all individual project runs as a service (container).
+- node (v18+)
+- npm (v8+)
+- docker compose (v2+)
 
-A typical product (SaaS, etc.) usually consists of following services:
+Create `.env` file by making a copy of `.env.template` and filling in missing values
 
-- Landing page
-  - Used for introducing your business to customers
-  - Provide links to download the mobile application
-  - Provide link to access web application
-  - Contact page
-  - Privacy policy page
-  - Terms of use page
-  - SEO friendly (should support server side rendering)
-- Web Application
-  - Your actual application for your customers to use
-  - Desktop browser
-  - Tablet and mobile browser via responsive design
-- Mobile Application
-  - Your actual application for your customers to use
-  - Android (Mobile/Tablet)
-  - iOS (Mobile/Tablet)
+Running development server:
 
-## Core Structure
+1. `npm install`
+2. `npm run dev`
 
- can you convert this to an image 
-React Application
-├── src
-│   ├── api
-│   │   ├── auth.js
-│   │   ├── business.js
-│   │   └── user.js
-│   ├── assets
-│   │   ├── icons
-│   │   └── images
-│   ├── components
-│   │   ├── Button
-│   │   ├── Input
-│   │   └── Spinner
-│   ├── config
-│   │   └── index.js
-│   ├── pages
-│   │   ├── Authentication
-│   │   │   ├── Login
-│   │   │   │   ├── Login.scss
-│   │   │   │   └── Login.tsx
-│   │   │   ├── Signup
-│   │   │   │   ├── Signup.scss
-│   │   │   │   └── Signup.tsx
-│   │   │   └── Verification
-│   │   │       ├── VerifyAccount.tsx
-│   │   │       └── VerifiedEmail.tsx
-│   │   ├── ContactSupport
-│   │   │   ├── ContactSupport.scss
-│   │   │   └── ContactSupport.tsx
-│   │   └── DiscoverBusinesses
-│   │       ├── BusinessCatalogue
-│   │       │   ├── FilterBusinessProfiles
-│   │       │   │   ├── FilterBusinessProfiles.scss
-│   │       │   │   └── FilterBusinessProfiles.tsx
-│   │       │   ├── BusinessCatalogue.scss
-│   │       │   └── BusinessCatalogue.tsx
-│   ├── utils
-│   │   └── helper.js
-│   ├── App.scss
-│   └── App.tsx
-├── public
-│   ├── index.html
-│   └── favicon.ico
-├── package.json
-└── README.md (you are here )
+Running development database:
 
-## Stack
+1. `npm run database:start`
+2. `npm run database:migrate`
 
-### Backend
+Creating new migrations can be done automatically by updating the `schema.prisma` models and running `npm run database:migrate`. For more details see the [prisma docs](https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate).
 
-- API
-  - NodeJS
-  - Express
-- Database
-  - Postgres
-- Proxy
-  - NGINX
+For VSCode it's recommended to install the [Prisma Plugin](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
 
-### Frontend
-- Web
-  - React
-  - Redux
-  - React Router
-  - Material UI
-- Mobile (iOS, Android)
-  - React Native
-  - Redux
-  - React Navigation
+## Tests
 
-### Deployment
+Tests can be run with
 
-- Technologies
-  - Docker
-  - Docker compose
+`npm run test`
+
+To automatically re-run tests when files change run
+
+`npm run test -- --watch`
+
+To watch specific files matching a regex, for example filenames containing "route", run
+
+`npm run test -- --watch route`
+
+## Linting
+
+This project uses [eslint](https://eslint.org/) for static analysis. If using VSCode its recommended to install [ESLint plugin](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+
+## Style Guidelines
+
+This project uses [Prettier](https://prettier.io/) to enforce code formatting.
+To setup prettier for your editor see https://prettier.io/docs/en/editors.html
+
+For VSCode it's recommended to install the [Prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) and enable it on save.
+
+## Commit Guidelines
+
+For branch naming conventions and developer workflow guidelines see [Development Workflow](https://orkestra-scs.atlassian.net/wiki/spaces/PD/pages/35291365/Development+Workflow)
+
+Pre-commit hooks run prettier on all files to enforce style guidelines.
+
+To skip this run with `git push --no-verify`
