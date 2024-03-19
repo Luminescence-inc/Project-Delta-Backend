@@ -21,3 +21,8 @@ Server started on :3000
 
 ## API
 
+### Generate url
+```bash
+$ curl -X POST http://localhost:3000/api/url/generate -d '{"url":"https://www.youtube.com"}'
+
+```
