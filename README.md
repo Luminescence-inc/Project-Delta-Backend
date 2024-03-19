@@ -24,33 +24,33 @@ Server started on :3000
 ### Generate url
 
 ```bash
-$ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: application/json" -d '{"url": "https://www.youtube.com/"}' 
+$ curl -X POST -H "Content-Type: application/json" -d '{"url": "https://www.youtube.com/"}' http://localhost:3000/generate' 
 
-{"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
+{"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://localhost:3000/BBuwm8Fd"}}
 ```
 
 ### Redirect url
 
 ```bash
-$ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: application/json" -d '{"url": "https://www.youtube.com/"}' 
+$ curl -X GET http://localhost:3000/ynSCqOLL
 
-{"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
+Found. Redirecting to https://www.youtube.com/
 ```
 
 ### Analytics
 
 ```bash
-$ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: application/json" -d '{"url": "https://www.youtube.com/"}' 
+$ curl -X GET http://localhost:3000/analytics/ynSCqOLL
 
-{"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
+{"status":200,"data":{"oneday":{"count":4,"averageRequestTime":0.5},"oneWeek":{"count":4,"averageRequestTime":0.5},"allTime":{"count":4,"averageRequestTime":0.5}}}
 ```
 
 ### Get All url
 
 ```bash
-$ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: application/json" -d '{"url": "https://www.youtube.com/"}' 
-
-{"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
+$ curl -X GET http://localhost:3000/
+               
+{"status":200,"data":[{"shortUrl":"http://localhost:3000/ynSCqOLL","longUrl":"https://www.youtube.com/","analytics":{"oneday":{"count":4,"averageRequestTime":0.5},"oneWeek":{"count":4,"averageRequestTime":0.5},"allTime":{"count":4,"averageRequestTime":0.5}}},{"shortUrl":"http://localhost:3000/BBuwm8Fd","longUrl":"https://www.youtube.com/","analytics":{"oneday":{"count":0,"averageRequestTime":0},"oneWeek":{"count":0,"averageRequestTime":0},"allTime":{"count":0,"averageRequestTime":0}}}]}
 ```
 
 
