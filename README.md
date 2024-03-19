@@ -56,6 +56,7 @@ $ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: applicat
 
 ## System Architecture
 
+
 ### Functional Requirement
 - Generated Short Url should have one long url
 - Short Url is Permanent, once created
@@ -69,10 +70,7 @@ $ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: applicat
 - HTTP-based RESTFUL API
 
 
-
 ### System Capacity Estimations
-
-
 
 #### Traffic Estimate
 
@@ -85,7 +83,6 @@ Number of short url links per seconds = 1 million /(30 days * 24 hours * 3600 se
 With 200:1 read/write ratio, number of redirections = 0.4 URLs/s * 50 = 20 URLs/s
 
 
-
 #### Storage Estimate
 
 Assuming the service will last for 10 years and create 1 million shortened links each month, we'll have a total of 120 million data points (i.e 1 million/month * 10 (years) * 12 (months)) in the system.
@@ -93,8 +90,17 @@ Assuming the service will last for 10 years and create 1 million shortened links
 With each data object being 500 bytes in size, the total storage needed would be around 55.91 gigabytes.
 
 
-
 ### Short Url Generator
 
+#### Encoding with base62
+A base is a number of digits or characters that can be used to represent a particular number.
+
+base 62 are [0–9][a-z][A-Z]
+
+Number of possible short URLs using base62 and No of characters:
+
+- 6 characters short URL: `62^6 = ~56.8 billion` possible URLs
+- 7 characters short URL: `62^7 = ~3.52 trillion` possible URLs
+- 8 characters short URL: `62^8 = ~218 trillion` possible URLs
 
 
