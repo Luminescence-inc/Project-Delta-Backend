@@ -19,6 +19,12 @@ $ docker compose up -d --build
 Server started on :3000
 ```
 
+Shuting Down development server:
+
+```bash
+$ docker compose down
+```
+
 ## API
 
 ### Generate url
