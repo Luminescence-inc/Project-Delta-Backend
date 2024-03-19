@@ -118,4 +118,5 @@ Database Requierements:
 NoSql db was used in this implementation, since it fit our requirements and its easily scalable. 
 
 
-
+### Cache
+Given that we aim to redirect a short URL within 10ms or less, a caching mechanism has been implemented for frequently requested short URLs. The objective is to verify the URL's presence in the cache for a quicker response before accessing the database.
