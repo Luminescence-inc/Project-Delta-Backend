@@ -65,7 +65,12 @@ $ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: applicat
 
 ### Non-Functional Requirement
 - Redirecting a short url to a long url within 10 ms
+- Data must survive computer restarts
 - HTTP-based RESTFUL API
+
+### System Capacity Estimations
+
+#### Traffic Estimate
 
 
 
