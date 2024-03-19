@@ -14,13 +14,10 @@ Pre-requisites:
 
 Running development server:
 
-- `$ cd server`
-- `$ docker compose up --build`
-
 ```bash
-$ cd url-shortener
+$ cd server
 $ docker compose up --build
 
-Starting the server on :3000
+Server started on :3000
 ```
 
