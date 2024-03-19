@@ -31,11 +31,6 @@ $ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: applicat
 {"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
 ```
 
-Postman:
-
-<img width="691" alt="Screenshot 2024-03-18 at 11 22 12 PM" src="https://github.com/Luminescence-inc/Project-Delta-Backend/assets/55120346/536d1ed5-9839-49ed-833e-bda10bc7422e">
-
-
 ### Redirect url
 
 Curl:
@@ -45,11 +40,6 @@ $ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: applicat
 
 {"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
 ```
-
-Postman:
-
-<img width="691" alt="Screenshot 2024-03-18 at 11 22 12 PM" src="https://github.com/Luminescence-inc/Project-Delta-Backend/assets/55120346/536d1ed5-9839-49ed-833e-bda10bc7422e">
-
 
 ### Analytics
 
@@ -61,11 +51,6 @@ $ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: applicat
 {"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
 ```
 
-Postman:
-
-<img width="691" alt="Screenshot 2024-03-18 at 11 22 12 PM" src="https://github.com/Luminescence-inc/Project-Delta-Backend/assets/55120346/536d1ed5-9839-49ed-833e-bda10bc7422e">
-
-
 ### Get All url
 
 Curl:
@@ -76,6 +61,20 @@ $ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: applicat
 {"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
 ```
 
-Postman:
+## System Architecture
 
-<img width="691" alt="Screenshot 2024-03-18 at 11 22 12 PM" src="https://github.com/Luminescence-inc/Project-Delta-Backend/assets/55120346/536d1ed5-9839-49ed-833e-bda10bc7422e">
+### Functional Requirement
+- Generated Short Url should have one long url
+- Short Url is Permanent, once created
+- Short url is Unique; If a long url is added twice it should result in two different short urls
+- Short Url is not easily discoverable; incrementing an already existing short url should have a low probability of finding a working short url
+- Able to List the number of times a short url has been accessed in the last 24 hours, past week and all time
+
+### Non-Functional Requirement
+- Redirecting a short url to a long url within 10 ms
+- HTTP-based RESTFUL API
+
+
+
+
+
