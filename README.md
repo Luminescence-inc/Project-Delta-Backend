@@ -89,7 +89,7 @@ With 200:1 read/write ratio, number of redirections = 0.4 URLs/s * 50 = 20 URLs/
 
 Assuming the service will last for 10 years and create 1 million shortened links each month, we'll have a total of 120 million data points (i.e 1 million/month * 10 (years) * 12 (months)) in the system.
 
-With each data object being 500 bytes in size, the total storage needed would be around 55.91 gigabytes.
+With each data object being 500 bytes in size, the total storage needed would be around 55.91 GB.
 
 
 ## Short-Url Generator
