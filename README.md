@@ -17,3 +17,10 @@ Running development server:
 - `$ cd server`
 - `$ docker compose up --build`
 
+```bash
+$ cd url-shortener
+$ docker compose up --build
+
+Starting the server on :3000
+```
+
