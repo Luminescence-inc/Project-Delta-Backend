@@ -23,6 +23,7 @@ Server started on :3000
 
 ### Generate url
 ```bash
-$ curl -X POST http://localhost:3000/api/url/generate -d '{"url":"https://www.youtube.com"}'
+$ curl -X POST http://localhost:3000/api/url/generate -H "Content-Type: application/json" -d '{"url": "https://www.youtube.com/"}' 
 
+{"status":200,"data":{"longUrl":"https://www.youtube.com/","shortUrl":"http://cloudflair.url/Z5YqHEAs"}}
 ```
