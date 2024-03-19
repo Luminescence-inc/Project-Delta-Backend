@@ -4,8 +4,6 @@
 
 This is a HTTP-based RESTful API written in Express, for managing Short URLs and redirecting clients similar to other service like bit.ly or goo.gl.
 
-[architecture here.]( )
-
 ## Getting Started
 
 Pre-requisites:
