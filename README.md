@@ -8,16 +8,16 @@ This is a HTTP-based RESTful API written in Express, for managing Short URLs and
 
 Pre-requisites:
 
-- node (v18+)
-- npm (v8+)
 - docker compose (v2+)
 
 Running development server:
 
 ```bash
 $ cd server
-$ docker compose up --build
+$ docker compose up -d --build
 
 Server started on :3000
 ```
+
+## API
 
