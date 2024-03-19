@@ -1,4 +1,4 @@
-# CloudFlare URL Shortner Service
+# Short-URL HTTP Service
 
 ## Introduction
 
