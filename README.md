@@ -16,7 +16,7 @@ Running development server:
 $ cd server
 $ docker compose up -d --build
 
-Server started on port :3000
+Server starts on port :3000
 ```
 
 Shuting Down development server:
