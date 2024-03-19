@@ -44,6 +44,7 @@ $ curl -X GET http://localhost:3000/analytics/ynSCqOLL
 
 {"status":200,"data":{"oneday":{"count":4,"averageRequestTime":0.5},"oneWeek":{"count":4,"averageRequestTime":0.5},"allTime":{"count":4,"averageRequestTime":0.5}}}
 ```
+NB: averageRequestTime isin ms.
 
 ### Get All url
 
