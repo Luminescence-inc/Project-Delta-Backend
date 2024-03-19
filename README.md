@@ -103,4 +103,19 @@ Number of possible short URLs using base62 and No of characters:
 - 7 characters short URL: `62^7 = ~3.52 trillion` possible URLs
 - 8 characters short URL: `62^8 = ~218 trillion` possible URLs
 
+Given the large range of possible urls, base 62 encoding was used in creating the short urls
+
+### DataBase
+
+Database Requierements: 
+
+- High storage capabilities
+
+- Read heavy based on our estimation.
+
+- Easily scalable.
+
+NoSql db was used in this implementation, since it fit our requirements and its easily scalable. 
+
+
 
