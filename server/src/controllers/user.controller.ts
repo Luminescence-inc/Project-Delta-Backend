@@ -25,13 +25,13 @@ export default class UserController {
     const { firstName, lastName, email, password } = req.body;
 
     try {
-      const isEmailPresent = await this.userService.isEmailPresent(email);
+      const isEmailPresent = await this.userService.isEmailPresent(email.toLowerCase());
 
       if (isEmailPresent) {
-        return respond.status(400).success(false).code(409).desc(`User with email ${email} already exist`).send();
+        return respond.status(400).success(false).code(409).desc(`User with email ${email.toLowerCase()} already exist`).send();
       }
 
-      const user = await this.userService.createUserDetails(firstName, lastName, email, hashSync(password, 10)); // env: salt for password
+      const user = await this.userService.createUserDetails(firstName, lastName, email.toLowerCase(), hashSync(password, 10)); // env: salt for password
 
       if (user.uuid) {
         // send verification email
@@ -120,13 +120,13 @@ export default class UserController {
     const { email, password } = req.body;
 
     try {
-      const isEmailPresent = await this.userService.isEmailPresent(email);
+      const isEmailPresent = await this.userService.isEmailPresent(email.toLowerCase());
 
       if (!isEmailPresent) {
         return respond.status(404).success(false).code(404).desc(`email does not exist`).send();
       }
 
-      const userDetails = await this.userService.findUserByEmail(email);
+      const userDetails = await this.userService.findUserByEmail(email.toLowerCase());
 
       if (userDetails?.password) {
         const userpassword = userDetails?.password as string;
@@ -259,13 +259,13 @@ export default class UserController {
     const { userEmail } = req.params;
 
     try {
-      const emailPresent = await this.userService.isEmailPresent(userEmail);
+      const emailPresent = await this.userService.isEmailPresent(userEmail.toLowerCase());
 
       if (!emailPresent) {
-        return respond.status(404).success(false).code(404).desc(`email {${userEmail}} does not exist`).send();
+        return respond.status(404).success(false).code(404).desc(`email {${userEmail.toLowerCase()}} does not exist`).send();
       }
 
-      const userDetails = await this.userService.findUserByEmail(userEmail);
+      const userDetails = await this.userService.findUserByEmail(userEmail.toLowerCase());
 
       if (userDetails) {
         const id = userDetails?.uuid as string;
