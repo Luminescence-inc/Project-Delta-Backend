@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification</title>
+    <style>
+      body {
+        font-family:
+          Helvetica Neue,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        font-size: 12px;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .container {
+        max-width: 600px;
+        background-color: #ffffff;
+      }
+      .sectionOne {
+        padding: 30px 0;
+        text-align: center;
+        margin-top: 40px;
+      }
+      .sectionFour {
+        padding: 10px 0 10px 10px;
+        color: #9090a7;
+      }
+      .sectionFive {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 95%;
+        padding: 10px 10px 20px 10px;
+      }
+
+      .header {
+        background-color: #0e2d52;
+        color: #ffffff;
+        padding: 20px 0;
+        text-align: center;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        box-shadow: 0px 2px 5px #888888;
+      }
+      .header img {
+        margin-right: 10px;
+      }
+      .footer {
+        font-size: 12px;
+        color: #888888;
+        padding: 0 10px 0px 10px;
+      }
+      .button {
+        background-color: #0e2d52;
+        border-radius: 10px;
+        color: #ffffff;
+        padding: 10px 20px;
+        text-decoration: none;
+        display: inline-block;
+        margin: 20px 0;
+      }
+      .spacing {
+        padding: 10px 10px 0px 10px;
+      }
+
+      .logoContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 18.25px;
+        width: 18.25px;
+        border-radius: 50%;
+        background-color: #9090a7;
+      }
+
+      .linkStyle {
+        color: #17bebb;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="sectionOne">
+        <!-- Your logo here -->
+        <img src="/public/logo.png" alt="BizConnect24" />
+      </div>
+      <div>
+        <div class="header">
+          <span style="margin: 0 1px">
+            <img style="width: 24px; height: 24px" src="/public/email_verification_reminder_logo.png" alt="f" />
+          </span>
+          <h2>Verification Reminder</h2>
+        </div>
+        <div class="spacing">
+          <p>Hello {{firstName}}, 👋</p>
+          <p>
+            This is a reminder to confirm your email so that you can finish up your account creation process and tell
+            the world about your business. Kindly click on this
+            <a class="linkStyle" href="{{link}}">link</a> to complete the process.
+          </p>
+        </div>
+
+        <div style="padding: 30px 0; text-align: center">
+          <a href="{{link}}" class="button">Click to verify email</a>
+        </div>
+      </div>
+      <hr />
+      <div class="footer">
+        You have received this email from
+        <a class="linkStyle" href="mailto:support@bizconnect24.com">support@bizconnect24.com</a>
+        in response to your recent activity on Bizconnect24. If you didn't sign up, kindly ignore this email.<br />
+      </div>
+      <hr />
+      <div class="sectionFour">&copy; Bizconnect24 2024</div>
+      <div class="sectionFive">
+        <span><img style="width: 95.7px; height: 16px" src="/public/logo.png" alt="BizConnect24" /> </span>
+        <span style="display: inline-flex">
+          <span class="logoContainer" style="margin-left: 5px">
+            <img style="width: 9.73px; height: 9.73px" src="/public/instagramlogo.png" alt="i" />
+          </span>
+          <span class="logoContainer" style="margin-left: 5px">
+            <img style="width: 9.73px; height: 9.73px" src="/public/facebooklogo.png" alt="f"
+          /></span>
+          <span class="logoContainer" style="margin-left: 5px"><img src="/public/x.png" alt="x" /></span>
+        </span>
+      </div>
+    </div>
+  </body>
+</html>
