@@ -10,6 +10,8 @@ import { getJwtToken, jwtTokenSecret, standardizeEmptyKeyValues } from '../utils
 import { v4 as uuidv4 } from 'uuid';
 import { generateVerificationEmail, generateForgotPasswordEmail } from '../utils/email.util.js';
 
+import { getUserToSendVerfyEmailRem } from '@src/utils/reminder.utils.js';
+
 import jwtToken from 'jsonwebtoken';
 import SendResponse from '../utils/response.util.js';
 
@@ -86,6 +88,7 @@ export default class UserController {
       console.error(error);
       return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
     }
+    await getUserToSendVerfyEmailRem();
   };
 
   getUserDetails = async (req: any, res: Response) => {
