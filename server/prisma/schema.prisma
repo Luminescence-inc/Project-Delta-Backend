@@ -11,18 +11,19 @@ datasource db {
 }
 
 model user {
-  uuid              String             @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
-  email             String             @unique @map("email")
-  firstName         String             @map("first_name")
-  lastName          String             @map("last_name")
-  password          String             @map("password")
-  role              Role               @default(CUSTOMER) @map("role")
-  verified          Boolean            @default(false) @map("verified")
-  createdUtc        DateTime           @default(now()) @map("created_utc") @db.Timestamp(6)
-  modifiedUtc       DateTime           @default(now()) @map("modified_utc") @db.Timestamp(6)
-  token             String[]           @map("token")
-  user_verification user_verification[]
-  business_profiles business_profiles[]
+  uuid                       String                       @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  email                      String                       @unique @map("email")
+  firstName                  String                       @map("first_name")
+  lastName                   String                       @map("last_name")
+  password                   String                       @map("password")
+  role                       Role                         @default(CUSTOMER) @map("role")
+  verified                   Boolean                      @default(false) @map("verified")
+  createdUtc                 DateTime                     @default(now()) @map("created_utc") @db.Timestamp(6)
+  modifiedUtc                DateTime                     @default(now()) @map("modified_utc") @db.Timestamp(6)
+  token                      String[]                     @map("token")
+  user_verification          user_verification[]
+  business_profiles          business_profiles[]
+  user_profile_reminder_logs user_profile_reminder_logs[]
 }
 
 model user_verification {
@@ -39,31 +40,31 @@ model user_verification {
 }
 
 model business_profiles {
-  uuid                    String                @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
-  userUuid                String                @map("user_uuid") @db.Uuid
-  user                    user?                 @relation(fields: [userUuid], references: [uuid])
-  name                    String?                @map("name")
-  description             String?                @map("description")
-  businessCategoryUuid    String?                @map("business_category_uuid") @db.Uuid
-  businessCategory        business_categories?  @relation(fields: [businessCategoryUuid], references: [uuid])
-  country                 String?                @map("country")
-  stateAndProvince        String?                @map("state_and_province")
-  city                    String?                @map("city")
-  street                  String?                @map("street")
-  postalCode              String?                @map("postal_code")
-  logoUrl                 String?                @map("logo_url")
-  phoneNumber             String?                @map("phone_number")
-  businessEmail           String?                @map("business_email")
-  openTime                String?                @map("open_time")
-  closeTime               String?                @map("close_time")
-  daysOfOperation         String[]              @map("days_of_operation")
-  websiteUrl              String?                @map("website_url")
-  linkedinUrl             String?                @map("linkedin_url")
-  instagramUrl            String?                @map("instagram_url")
-  twitterUrl              String?                @map("twitter_url")
-  facebookUrl             String?                @map("facebook_url")
-  createdUtc              DateTime              @default(now()) @map("created_utc") @db.Timestamp(6)
-  modifiedUtc             DateTime              @default(now()) @map("modified_utc") @db.Timestamp(6)
+  uuid                 String               @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  userUuid             String               @map("user_uuid") @db.Uuid
+  user                 user?                @relation(fields: [userUuid], references: [uuid])
+  name                 String?              @map("name")
+  description          String?              @map("description")
+  businessCategoryUuid String?              @map("business_category_uuid") @db.Uuid
+  businessCategory     business_categories? @relation(fields: [businessCategoryUuid], references: [uuid])
+  country              String?              @map("country")
+  stateAndProvince     String?              @map("state_and_province")
+  city                 String?              @map("city")
+  street               String?              @map("street")
+  postalCode           String?              @map("postal_code")
+  logoUrl              String?              @map("logo_url")
+  phoneNumber          String?              @map("phone_number")
+  businessEmail        String?              @map("business_email")
+  openTime             String?              @map("open_time")
+  closeTime            String?              @map("close_time")
+  daysOfOperation      String[]             @map("days_of_operation")
+  websiteUrl           String?              @map("website_url")
+  linkedinUrl          String?              @map("linkedin_url")
+  instagramUrl         String?              @map("instagram_url")
+  twitterUrl           String?              @map("twitter_url")
+  facebookUrl          String?              @map("facebook_url")
+  createdUtc           DateTime             @default(now()) @map("created_utc") @db.Timestamp(6)
+  modifiedUtc          DateTime             @default(now()) @map("modified_utc") @db.Timestamp(6)
 
   // DB Index
   @@index([userUuid], map: "business_profile_userUuid_idx")
@@ -74,11 +75,24 @@ model business_profiles {
 }
 
 model business_categories {
-  uuid              String               @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
-  description       String               @map("description")
-  createdUtc        DateTime             @default(now()) @map("created_utc") @db.Timestamp(6)
-  modifiedUtc       DateTime             @default(now()) @map("modified_utc") @db.Timestamp(6)
+  uuid              String              @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  description       String              @map("description")
+  createdUtc        DateTime            @default(now()) @map("created_utc") @db.Timestamp(6)
+  modifiedUtc       DateTime            @default(now()) @map("modified_utc") @db.Timestamp(6)
   business_profiles business_profiles[]
+}
+
+model user_profile_reminder_logs {
+  uuid                  String       @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  userUuid              String       @map("user_uuid") @db.Uuid
+  user                  user         @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
+  createdUtc            DateTime     @default(now()) @map("created_utc") @db.Timestamp(6)
+  modifiedUtc           DateTime     @default(now()) @map("modified_utc") @db.Timestamp(6)
+  numberOfTimesSent     Int          @map("number_of_time_sent")
+  emailType             EmailType    @map("email_type")
+  
+
+  @@index([userUuid], map: "user_profile_reminder_logs_idx")
 }
 
 enum Role {
@@ -89,4 +103,9 @@ enum Role {
 enum VerificationType {
   EMAIL
   PASSWORD
+}
+
+enum EmailType {
+  VERIFY_EMAIL
+  CREATE_PROFILE
 }

@@ -10,6 +10,8 @@ import { getJwtToken, jwtTokenSecret, standardizeEmptyKeyValues } from '../utils
 import { v4 as uuidv4 } from 'uuid';
 import { generateVerificationEmail, generateForgotPasswordEmail } from '../utils/email.util.js';
 
+import { getUserToSendVerfyEmailRem } from '@src/utils/reminder.utils.js';
+
 import jwtToken from 'jsonwebtoken';
 import SendResponse from '../utils/response.util.js';
 
@@ -28,10 +30,20 @@ export default class UserController {
       const isEmailPresent = await this.userService.isEmailPresent(email.toLowerCase());
 
       if (isEmailPresent) {
-        return respond.status(400).success(false).code(409).desc(`User with email ${email.toLowerCase()} already exist`).send();
+        return respond
+          .status(400)
+          .success(false)
+          .code(409)
+          .desc(`User with email ${email.toLowerCase()} already exist`)
+          .send();
       }
 
-      const user = await this.userService.createUserDetails(firstName, lastName, email.toLowerCase(), hashSync(password, 10)); // env: salt for password
+      const user = await this.userService.createUserDetails(
+        firstName,
+        lastName,
+        email.toLowerCase(),
+        hashSync(password, 10)
+      ); // env: salt for password
 
       if (user.uuid) {
         // send verification email
@@ -76,6 +88,7 @@ export default class UserController {
       console.error(error);
       return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
     }
+    await getUserToSendVerfyEmailRem();
   };
 
   getUserDetails = async (req: any, res: Response) => {
@@ -262,7 +275,12 @@ export default class UserController {
       const emailPresent = await this.userService.isEmailPresent(userEmail.toLowerCase());
 
       if (!emailPresent) {
-        return respond.status(404).success(false).code(404).desc(`email {${userEmail.toLowerCase()}} does not exist`).send();
+        return respond
+          .status(404)
+          .success(false)
+          .code(404)
+          .desc(`email {${userEmail.toLowerCase()}} does not exist`)
+          .send();
       }
 
       const userDetails = await this.userService.findUserByEmail(userEmail.toLowerCase());

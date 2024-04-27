@@ -14,6 +14,7 @@ app.use(
     origin: '*',
   })
 );
+app.use('/public', express.static('public'));
 app.get('/', (req, res) => {
   res.status(200).json({
     message: 'success',
