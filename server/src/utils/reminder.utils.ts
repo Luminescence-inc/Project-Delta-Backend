@@ -91,12 +91,45 @@ const getUsersToRemindOfEmailVerification = async (
       createdUtc: {
         lt: upperBoundTime,
         gt: lowerBoundTime,
+=======
+import { UserDetailsForEmail, ReminderLogDetails } from '@src/types/user';
+import { EmailType } from '@prisma/client';
+
+export const getUserToSendVerfyEmailRem = async (): Promise<UserDetailsForEmail[]> => {
+  // fetch users who has not been verified with 6 - 24 hours
+  const now = new Date();
+  const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const users = await prisma.user.findMany({
+    where: {
+      createdUtc: {
+        gte: twentyFourHoursAgo,
+        lt: twoHoursAgo,
+      },
+    },
+    select: {
+      email: true,
+      uuid: true,
+    },
+  });
+
+  console.log('The Users: ', users);
+  return users;
+};
+
+export const getUserWithIds = async (includedUuid: string[]): Promise<{ [x: string]: string }> => {
+  const users = await prisma.user.findMany({
+    where: {
+      uuid: {
+        in: includedUuid,
+>>>>>>> 2b032ad (created the logic for get user to send emails)
       },
       verified: false,
     },
     select: {
       email: true,
       uuid: true,
+<<<<<<< HEAD
       firstName: true,
     },
   });
