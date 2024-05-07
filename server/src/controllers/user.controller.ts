@@ -59,7 +59,7 @@ export default class UserController {
         );
 
         if (newVerification.uuid) {
-          await generateVerificationEmail(user.uuid, user.email, uniqueString, Date.now() + 21600000)
+          await generateVerificationEmail(user.uuid, user.email, uniqueString, user.firstName)
             .then(() => console.info(`Verification email sent to - ${user.email}`))
             .catch(err => console.error(`Verification email failed with error message - ${err}`));
 
@@ -185,7 +185,7 @@ export default class UserController {
                     userDetails.uuid,
                     userDetails.email,
                     uniqueString,
-                    Date.now() + 21600000
+                    userDetails.firstName
                   )
                     .then(() => console.info(`Verification email sent to - ${userDetails.email}`))
                     .catch(err => console.error(`Verification email failed with error message - ${err}`));
@@ -205,7 +205,7 @@ export default class UserController {
                   userDetails.uuid,
                   userDetails.email,
                   uniqueString,
-                  Date.now() + 21600000
+                  userDetails.firstName
                 )
                   .then(() => console.info(`Verification email sent to - ${userDetails.email}`))
                   .catch(err => console.error(`Verification email failed with error message - ${err}`));
@@ -306,7 +306,7 @@ export default class UserController {
 
         if (newVerification) {
           if (type === 'verification') {
-            await generateVerificationEmail(userDetails.uuid, userDetails.email, uniqueString, Date.now() + 21600000)
+            await generateVerificationEmail(userDetails.uuid, userDetails.email, uniqueString, userDetails.firstName)
               .then(() => {
                 console.info(`Verification email sent to - ${userDetails.email}`);
                 return respond
@@ -319,7 +319,7 @@ export default class UserController {
               .catch(err => console.error(`Verification email failed with error message - ${err}`));
           }
           if (type === 'password') {
-            await generateForgotPasswordEmail(userDetails.uuid, userDetails.email, uniqueString, Date.now() + 21600000)
+            await generateForgotPasswordEmail(userDetails.uuid, userDetails.email, uniqueString, userDetails.firstName)
               .then(() => {
                 console.info(`Verification email sent to - ${userDetails.email}`);
                 return respond

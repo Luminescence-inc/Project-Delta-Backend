@@ -1,14 +1,15 @@
 import nodemailer from 'nodemailer';
 import handlebars from 'handlebars';
+import sendgrid from '@sendgrid/mail';
 import fs from 'fs';
 import { VerifyEmailData } from './reminder.utils';
 import { EmailType } from '@prisma/client';
 import { afterEffect } from './reminder.utils';
 
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
+
 const contactSupportTemplateSource = fs.readFileSync('src/templates/contact_support_template.html', 'utf-8').toString();
 const clientBaseUrl = process.env.CLIENT_BASE_URL;
-const source = fs.readFileSync('src/templates/email_template.html', 'utf-8').toString();
-const template = handlebars.compile(source);
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -22,29 +23,11 @@ export const generateVerificationEmail = (
   userId: string,
   userEmail: string,
   uniqueString: string,
-  expiresUtc: number
+  firstName: string
 ) => {
-  const date: any = new Date(expiresUtc);
-  const currentTime: any = new Date();
-  const replacements = {
-    title: 'Account Verification Email',
-    content: `Please click on the link below to verify your account and complete registration. Link will expire in ${Math.round(
-      (date - currentTime) / (1000 * 60 * 60)
-    )} hours`,
-    link: `${clientBaseUrl + '/verify-email/' + userId + '/' + uniqueString}`,
-  };
-  const htmlToSend = template(replacements);
-  const mailOptions = {
-    from: process.env.AUTH_EMAIL,
-    to: userEmail,
-    subject: 'Verify Your Email',
-    text: 'Verification Email',
-    html: htmlToSend,
-  };
-
   let newReminderToSave: VerifyEmailData = {
     uuid: undefined,
-    firstName: '',
+    firstName: firstName,
     modifiedUtc: new Date(),
     emailType: EmailType.VERIFY_EMAIL,
     numberOfTimesSent: 1,
@@ -52,34 +35,41 @@ export const generateVerificationEmail = (
     email: userEmail,
   };
   afterEffect([newReminderToSave]);
-  return transporter.sendMail(mailOptions);
+
+  return sendgrid.send({
+    from: 'BizConnect24 <noreply@bizconnect24.com>',
+    templateId: 'd-91087e5e16dc4548a7e85c769b79fcff', //might have to read from env or config file
+    personalizations: [
+      {
+        to: `${userEmail}`,
+        dynamicTemplateData: {
+          firstName: `${firstName}`,
+          link: `${clientBaseUrl + '/verify-email/' + userId + '/' + uniqueString}`,
+        },
+      },
+    ],
+  });
 };
 
 export const generateForgotPasswordEmail = (
   userId: string,
   userEmail: string,
   uniqueString: string,
-  expiresUtc: number
+  firstName: string
 ) => {
-  const date: any = new Date(expiresUtc);
-  const currentTime: any = new Date();
-  const replacements = {
-    title: 'Reset Password Email',
-    content: `Please click on the link below to Reset your password. Link will expire in ${Math.round(
-      (date - currentTime) / (1000 * 60 * 60)
-    )} hours`,
-    link: `${clientBaseUrl + '/forgot-password/reset/' + userId + '/' + uniqueString}`,
-  };
-  const htmlToSend = template(replacements);
-  const mailOptions = {
-    from: process.env.AUTH_EMAIL,
-    to: userEmail,
-    subject: 'Reset Your Password',
-    text: 'Reste Password Email',
-    html: htmlToSend,
-  };
-
-  return transporter.sendMail(mailOptions);
+  return sendgrid.send({
+    from: 'BizConnect24 <noreply@bizconnect24.com>',
+    templateId: 'd-13b87dc92793431f97206f4b76058af5', //might have to read from env or config file
+    personalizations: [
+      {
+        to: `${userEmail}`,
+        dynamicTemplateData: {
+          firstName: `${firstName}`,
+          link: `${clientBaseUrl + '/forgot-password/reset/' + userId + '/' + uniqueString}`,
+        },
+      },
+    ],
+  });
 };
 
 export const generateSupportEmail = (
