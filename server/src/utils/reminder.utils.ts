@@ -24,6 +24,7 @@ const getVerfiedUserUuid = async (): Promise<string[]> => {
     },
     select: {
       uuid: true,
+      firstName: true,
     },
   });
   return users.map(usr => usr.uuid);
@@ -216,6 +217,55 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
     return result;
   }
 };
+const getReminderTypeEmailVerify = async (): Promise<ReminderLogDetails[]> => {
+  let reminderTypeEmailVerify = await prisma.user_profile_reminder_logs.findMany({
+    where: {
+      emailType: EmailType.VERIFY_EMAIL,
+    },
+    select: {
+      uuid: true,
+      userUuid: true,
+    },
+  });
+  return reminderTypeEmailVerify;
+};
+export const afterEffect = async (reminderToUpsert: VerifyEmailData[]): Promise<string> => {
+  //get the array of uuids
+  console.log('The thing to upsert ', reminderToUpsert);
+  let uuidArr: string[] = reminderToUpsert.map(rem => rem.uuid).filter(remUuid => remUuid != undefined);
+  // get a list of userUuid
+  let userUuidArr: string[] = reminderToUpsert.map(rem => rem.userUuid).filter(remUserUUid => remUserUUid != undefined);
+  console.log('The uuid in thing to upsser ', uuidArr);
+  console.log('The userUUid in things to upsert ', userUuidArr);
+  // get reminders of type VERIFY_EMAIL
+  let reminderTypeEmailVerify: ReminderLogDetails[] = await getReminderTypeEmailVerify();
+  let uuidsToUpdate: string[] = [];
+  let userUuidsToUpdate: { [key: string]: string } = {};
+  // map through the reminderToUpsert array
+  reminderTypeEmailVerify.forEach(remToUp => {
+    if (uuidArr.includes(remToUp.uuid)) {
+      uuidsToUpdate.push(remToUp.uuid);
+    }
+    if (userUuidArr.includes(remToUp.userUuid)) {
+      userUuidsToUpdate[remToUp.userUuid] = remToUp.uuid;
+    }
+  });
+  console.log('The total verification row ', reminderTypeEmailVerify);
+  console.log('User Id available  ', userUuidsToUpdate);
+  console.log('uuid available ', uuidsToUpdate);
+  let operations = reminderToUpsert.map(thisReminder => {
+    if (Object.keys(userUuidsToUpdate).includes(thisReminder.userUuid)) {
+      let theUuid = userUuidsToUpdate[thisReminder.userUuid];
+      return prisma.user_profile_reminder_logs.update({
+        where: {
+          uuid: theUuid,
+        },
+        data: {
+          numberOfTimesSent: thisReminder.numberOfTimesSent,
+          modifiedUtc: thisReminder.modifiedUtc || new Date(),
+        },
+      });
+    }
 
 /**
  * This is responsible for sending email to the users
