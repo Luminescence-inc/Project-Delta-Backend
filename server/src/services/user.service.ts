@@ -15,19 +15,23 @@ export default class userService {
     });
   }
 
-  async updateUserDetails (useruuid: string, firstName: string | null, lastName: string | null, password: string | null) {
-    
-    let data: Record<string, string> = {}
-    
-    if(firstName){
+  async updateUserDetails(
+    useruuid: string,
+    firstName: string | null,
+    lastName: string | null,
+    password: string | null
+  ) {
+    let data: Record<string, string> = {};
+
+    if (firstName) {
       data['firstName'] = firstName;
     }
 
-    if(lastName){
+    if (lastName) {
       data['lastName'] = lastName;
     }
 
-    if(password){
+    if (password) {
       data['password'] = password;
     }
 
@@ -40,8 +44,8 @@ export default class userService {
         lastName: true,
         email: true,
         role: true,
-        verified: true
-      }
+        verified: true,
+      },
     });
   }
 
@@ -103,7 +107,7 @@ export default class userService {
         lastName: true,
         email: true,
         role: true,
-        verified: true
+        verified: true,
       },
     });
   }
