@@ -4,7 +4,7 @@ import sendgrid from '@sendgrid/mail';
 import fs from 'fs';
 import { VerifyEmailData } from './reminder.utils';
 import { EmailType } from '@prisma/client';
-import { afterEffect } from './reminder.utils';
+import { afterEffectEmailVerify } from './reminder.utils';
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 
@@ -71,8 +71,26 @@ export const generateVerificationEmail = (
     userUuid: userId,
     email: userEmail,
   };
+<<<<<<< HEAD
   afterEffect([newReminderToSave]);
   return transporter.sendMail(mailOptions);
+=======
+  afterEffectEmailVerify([newReminderToSave]);
+
+  return sendgrid.send({
+    from: 'BizConnect24 <noreply@bizconnect24.com>',
+    templateId: 'd-91087e5e16dc4548a7e85c769b79fcff', //might have to read from env or config file
+    personalizations: [
+      {
+        to: `${userEmail}`,
+        dynamicTemplateData: {
+          firstName: `${firstName}`,
+          link: `${clientBaseUrl + '/verify-email/' + userId + '/' + uniqueString}`,
+        },
+      },
+    ],
+  });
+>>>>>>> 7f3e767 (Added logic for email verification)
 };
 >>>>>>> f3a2607 (added logic for scheduling emails)
 
