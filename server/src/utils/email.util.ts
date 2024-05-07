@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer';
 import handlebars from 'handlebars';
 import fs from 'fs';
+import { VerifyEmailData } from './reminder.utils';
+import { EmailType } from '@prisma/client';
+import { afterEffect } from './reminder.utils';
 
 const contactSupportTemplateSource = fs.readFileSync('src/templates/contact_support_template.html', 'utf-8').toString();
 const clientBaseUrl = process.env.CLIENT_BASE_URL;
@@ -39,6 +42,16 @@ export const generateVerificationEmail = (
     html: htmlToSend,
   };
 
+  let newReminderToSave: VerifyEmailData = {
+    uuid: undefined,
+    firstName: '',
+    modifiedUtc: new Date(),
+    emailType: EmailType.VERIFY_EMAIL,
+    numberOfTimesSent: 1,
+    userUuid: userId,
+    email: userEmail,
+  };
+  afterEffect([newReminderToSave]);
   return transporter.sendMail(mailOptions);
 };
 

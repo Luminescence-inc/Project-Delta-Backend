@@ -229,6 +229,9 @@ export default class UserController {
       const verificationLinks = await this.userService.findVerificationLinkByUserId(userId, VerificationType.EMAIL);
 
       if (!verificationLinks) {
+        console.log(
+          'Account has been verified or link has expired. logIn to generate new verification link or Check your email for a new verification link'
+        );
         return respond
           .status(400)
           .success(false)
@@ -240,6 +243,7 @@ export default class UserController {
       } else {
         const { expiresUtc, uniqueString: dbHashedUniqueString } = verificationLinks;
         if (expiresUtc < new Date()) {
+          console.log('Did it occur here ');
           // record has expired hence delete record
           await this.userService.deleteVerificationLink(dbHashedUniqueString);
           return respond
@@ -252,6 +256,8 @@ export default class UserController {
             .send();
         }
 
+        console.log('String Two ', compareSync(uniqueString, dbHashedUniqueString));
+        let converted;
         if (compareSync(uniqueString, dbHashedUniqueString)) {
           const user = await this.userService.verifyUserById(userId);
           if (user) {
