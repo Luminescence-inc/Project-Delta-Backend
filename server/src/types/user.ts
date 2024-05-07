@@ -1,6 +1,7 @@
 export interface UserDetailsForEmail {
   uuid: string;
   email?: string;
+  firstName: string;
 }
 
 export interface ReminderLogDetails {
