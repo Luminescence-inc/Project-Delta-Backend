@@ -4,7 +4,7 @@ import sendgrid from '@sendgrid/mail';
 import fs from 'fs';
 import { VerifyEmailData } from './reminder.utils';
 import { EmailType } from '@prisma/client';
-import { afterEffect } from './reminder.utils';
+import { afterEffectEmailVerify } from './reminder.utils';
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 
