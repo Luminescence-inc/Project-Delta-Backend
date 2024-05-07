@@ -1,4 +1,5 @@
 import { ToadScheduler, SimpleIntervalJob, AsyncTask } from 'toad-scheduler';
+<<<<<<< HEAD
 import { sendVerificationReminder, cleanUpReminderLogs } from '../utils/reminder.utils';
 
 export const scheduleAJob = () => {
@@ -13,4 +14,15 @@ export const scheduleAJob = () => {
   const jobTwo = new SimpleIntervalJob({ hours: 24 }, taskTwo, { preventOverrun: true });
   scheduler.addSimpleIntervalJob(jobOne);
   scheduler.addSimpleIntervalJob(jobTwo);
+=======
+import { sendVerificationReminder } from '@src/utils/reminder.utils';
+
+export const scheduleAJob = () => {
+  const scheduler = new ToadScheduler();
+  const task = new AsyncTask('send reminder', sendVerificationReminder, (err: Error) => {
+    console.error(err.message);
+  });
+  const job = new SimpleIntervalJob({ hours: 1 }, task, { preventOverrun: true });
+  scheduler.addSimpleIntervalJob(job);
+>>>>>>> f3a2607 (added logic for scheduling emails)
 };
