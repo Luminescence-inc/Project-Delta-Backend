@@ -21,7 +21,7 @@ export interface VerifyEmailData {
  * This fetches users that were created beteween 2 hours to 24 hours and has been verified
  */
 
-export const getUserToSendVerfyEmailRem = async (): Promise<UserDetailsForEmail[]> => {
+export const getUserToBusinessProfileEmailRem = async (): Promise<UserDetailsForEmail[]> => {
   // fetch users who has not been verified with 6 - 24 hours
   const now = new Date();
   const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
@@ -43,32 +43,6 @@ export const getUserToSendVerfyEmailRem = async (): Promise<UserDetailsForEmail[
 
   console.log('The Users: ', users);
   return users;
-};
-
-/**
- * returns a map of userUUid to array of user Email and user firstName
- *
- * @param {string[]} includedUuid The number to raise.
- */
-export const getUsersUsingIds = async (includedUuid: string[]): Promise<{ [x: string]: string[] }> => {
-  const users = await prisma.user.findMany({
-    where: {
-      uuid: {
-        in: includedUuid,
-      },
-      verified: false,
-    },
-    select: {
-      email: true,
-      uuid: true,
-      firstName: true,
-    },
-  });
-  let result: { [x: string]: string[] } = {};
-  users.forEach(usr => {
-    result[usr.uuid] = [usr.email, usr.firstName];
-  });
-  return result;
 };
 
 /**
@@ -97,7 +71,7 @@ const getUserInRemiderTable = async (uuids: string[]) => {
  */
 
 /**
- * Returns x raised to the n-th power.
+ * Returns the row of users to send the second business profile reminder
  *
  * @param {number} uuids The uuid of users.
  * @param {number} desiredCount The maximum number of time the email needs to be sent .
@@ -135,76 +109,9 @@ const getUsersToSendASecondEmail = async (
   return usersToSendSecondEmail;
 };
 
-/**
- * return rows of reminder data for email verification, that fits the stated criteria on the ticket
- * @param {number} emailType The type of email we are looking to send.
- * @param {number} upperBoundTime The time that need to elaspe before we send another email.
- *  * @param {number} lowerBoundTime
- *  * @param {number} desiredNumberOfTimes The maximum number of times an email needs to be sent.
- */
-const getFilteredUserFromReminder = async (
-  emailType: EmailType,
-  upperBoundTime: Date,
-  lowerBoundTime: Date,
-  desiredNumberOfTimes: number
-): Promise<ReminderLogDetails[]> => {
-  const reminders = await prisma.user_profile_reminder_logs.findMany({
-    where: {
-      modifiedUtc: {
-        gte: lowerBoundTime,
-        lt: upperBoundTime,
-      },
-      emailType: emailType,
-      numberOfTimesSent: {
-        lt: desiredNumberOfTimes,
-      },
-    },
-    select: {
-      uuid: true,
-      userUuid: true,
-      numberOfTimesSent: true,
-      createdUtc: true,
-      modifiedUtc: true,
-      emailType: true,
-    },
-  });
-  console.log('The Reminder is ', reminders);
-  return reminders;
-};
-
-/**
- * This fetches information required send verification email
- */
-export const getAddressToVerificationEmail = async (): Promise<VerifyEmailData[]> => {
-  const now = new Date();
-  const upperBoundTime = new Date(now.getTime() - 5 * 60 * 60 * 1000);
-  const lowerBoundTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  let uuidOfFilterUser: ReminderLogDetails[] = await getFilteredUserFromReminder(
-    EmailType.VERIFY_EMAIL,
-    upperBoundTime,
-    lowerBoundTime,
-    2
-  );
-  let userId: string[] = uuidOfFilterUser
-    .map(thereminder => thereminder.userUuid)
-    .filter(checks => checks != undefined);
-  let usersMap: { [x: string]: string[] } = await getUsersUsingIds(userId);
-  let result: VerifyEmailData[] = uuidOfFilterUser.map(reminderLog => {
-    return {
-      uuid: reminderLog.uuid,
-      numberOfTimesSent: reminderLog.numberOfTimesSent || 1,
-      email: usersMap[reminderLog.userUuid][0],
-      firstName: usersMap[reminderLog.userUuid][1],
-      userUuid: reminderLog.userUuid,
-    };
-  });
-  console.log('The resulkt ', result);
-  return result;
-};
-
 export const getAddressToProfileReminderEmail = async (): Promise<{ [key: string]: VerifyEmailData[] }> => {
   const now = new Date();
-  let userToRemind: UserDetailsForEmail[] = await getUserToSendVerfyEmailRem();
+  let userToRemind: UserDetailsForEmail[] = await getUserToBusinessProfileEmailRem();
   let mapOfUuidToEmail: { [x: string]: string[] } = {};
   userToRemind.forEach(usr => {
     if (usr.email && usr.firstName) {
@@ -253,6 +160,103 @@ export const getAddressToProfileReminderEmail = async (): Promise<{ [key: string
   console.log('The users to send mail ', mapOfUsersToSendReminders);
   return mapOfUsersToSendReminders;
 };
+/**
+ * This fetches information required send verification email
+ */
+export const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
+  const now = new Date();
+  const upperBoundTime = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+  const lowerBoundTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  let uuidOfFilterUser: ReminderLogDetails[] = await getFilteredUserFromReminder(
+    EmailType.VERIFY_EMAIL,
+    upperBoundTime,
+    lowerBoundTime,
+    2
+  );
+  let userId: string[] = uuidOfFilterUser
+    .map(thereminder => thereminder.userUuid)
+    .filter(checks => checks != undefined);
+  let usersMap: { [x: string]: string[] } = await getUsersUsingIds(userId);
+  let result: VerifyEmailData[] = uuidOfFilterUser.map(reminderLog => {
+    return {
+      uuid: reminderLog.uuid,
+      numberOfTimesSent: reminderLog.numberOfTimesSent || 1,
+      email: usersMap[reminderLog.userUuid][0],
+      firstName: usersMap[reminderLog.userUuid][1],
+      userUuid: reminderLog.userUuid,
+    };
+  });
+  return result;
+};
+
+/**
+ * a helper function for getReminderRowsThatFit, fetches reminder rows that meet the criteria
+ *
+ * @param {number} desiredNumberOfTimes The maximum number of time the email needs to be sent .
+ * @param {number} upperBoundTime The time that need to elaspe before we send another email
+ * @param {number} lowerBoundTime\
+ * @param {number} emailType The type of email we are looking to send.
+ *
+ */
+const getFilteredUserFromReminder = async (
+  emailType: EmailType,
+  upperBoundTime: Date,
+  lowerBoundTime: Date,
+  desiredNumberOfTimes: number
+): Promise<ReminderLogDetails[]> => {
+  const reminders = await prisma.user_profile_reminder_logs.findMany({
+    where: {
+      modifiedUtc: {
+        gte: lowerBoundTime,
+        lt: upperBoundTime,
+      },
+      emailType: emailType,
+      numberOfTimesSent: {
+        lt: desiredNumberOfTimes,
+      },
+    },
+    select: {
+      uuid: true,
+      userUuid: true,
+      numberOfTimesSent: true,
+      createdUtc: true,
+      modifiedUtc: true,
+      emailType: true,
+    },
+  });
+  return reminders;
+};
+
+/**
+ * returns a map of userUUid to array of user Email and user firstName
+ *
+ * @param {string[]} includedUuid The number to raise.
+ */
+export const getUsersUsingIds = async (includedUuid: string[]): Promise<{ [x: string]: string[] }> => {
+  const users = await prisma.user.findMany({
+    where: {
+      uuid: {
+        in: includedUuid,
+      },
+      verified: false,
+    },
+    select: {
+      email: true,
+      uuid: true,
+      firstName: true,
+    },
+  });
+  let result: { [x: string]: string[] } = {};
+  users.forEach(usr => {
+    result[usr.uuid] = [usr.email, usr.firstName];
+  });
+  return result;
+};
+
+/**
+ * Fetched reminder of type verify email.
+ *
+ */
 const getReminderTypeEmailVerify = async (): Promise<ReminderLogDetails[]> => {
   let reminderTypeEmailVerify = await prisma.user_profile_reminder_logs.findMany({
     where: {
@@ -265,19 +269,17 @@ const getReminderTypeEmailVerify = async (): Promise<ReminderLogDetails[]> => {
   });
   return reminderTypeEmailVerify;
 };
-export const afterEffect = async (reminderToUpsert: VerifyEmailData[]): Promise<string> => {
-  //get the array of uuids
-  console.log('The thing to upsert ', reminderToUpsert);
+
+/**
+ * This is responsible for updating the database after the email has been sent
+ * @param {VerifyEmailData[]} reminderToUpsert a list of object contain information required to update the DB.
+ */
+export const afterEffectEmailVerify = async (reminderToUpsert: VerifyEmailData[]): Promise<string> => {
   let uuidArr: string[] = reminderToUpsert.map(rem => rem.uuid).filter(remUuid => remUuid != undefined);
-  // get a list of userUuid
   let userUuidArr: string[] = reminderToUpsert.map(rem => rem.userUuid).filter(remUserUUid => remUserUUid != undefined);
-  console.log('The uuid in thing to upsser ', uuidArr);
-  console.log('The userUUid in things to upsert ', userUuidArr);
-  // get reminders of type VERIFY_EMAIL
   let reminderTypeEmailVerify: ReminderLogDetails[] = await getReminderTypeEmailVerify();
   let uuidsToUpdate: string[] = [];
   let userUuidsToUpdate: { [key: string]: string } = {};
-  // map through the reminderToUpsert array
   reminderTypeEmailVerify.forEach(remToUp => {
     if (uuidArr.includes(remToUp.uuid)) {
       uuidsToUpdate.push(remToUp.uuid);
@@ -286,9 +288,6 @@ export const afterEffect = async (reminderToUpsert: VerifyEmailData[]): Promise<
       userUuidsToUpdate[remToUp.userUuid] = remToUp.uuid;
     }
   });
-  console.log('The total verification row ', reminderTypeEmailVerify);
-  console.log('User Id available  ', userUuidsToUpdate);
-  console.log('uuid available ', uuidsToUpdate);
   let operations = reminderToUpsert.map(thisReminder => {
     if (Object.keys(userUuidsToUpdate).includes(thisReminder.userUuid)) {
       let theUuid = userUuidsToUpdate[thisReminder.userUuid];
@@ -316,7 +315,7 @@ export const afterEffect = async (reminderToUpsert: VerifyEmailData[]): Promise<
   });
 
   try {
-    const results = await prisma.$transaction(operations);
+    await prisma.$transaction(operations);
     return 'Success';
   } catch (error) {
     console.error('Failed to execute batch upsert:', error);
@@ -327,12 +326,10 @@ export const afterEffect = async (reminderToUpsert: VerifyEmailData[]): Promise<
   }
 };
 
-interface SendGridResponse {
-  statusCode: number;
-  headers: Record<string, string>;
-  body: string;
-}
-
+/**
+ * The obtains a map of userId to Unique string for creating a new verification unique string.
+ * @param {VerifyEmailData[]} userUuids a list of user uuids.
+ */
 const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key: string]: string }> => {
   let mapOfUserUuidToUuid: { [key: string]: string } = {};
   let verification = await prisma.user_verification.findMany({
@@ -375,8 +372,12 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
   }
 };
 
+/**
+ * This is responsible for sending email to the users
+ *
+ */
 export const sendVerificationReminder = async () => {
-  let reminderToUpsert = await getAddressToVerificationEmail();
+  let reminderToUpsert = await getReminderRowsThatFit();
   let userUuids = reminderToUpsert.map(data => {
     return data.userUuid;
   });
@@ -386,7 +387,7 @@ export const sendVerificationReminder = async () => {
     if (data.email) {
       let link = `${((clientBaseUrl + '/verify-email/' + data.userUuid) as string) + '/' + uniqueString[data.userUuid]}`;
       return sendgrid.send({
-        from: 'BizConnect24 <noreply@bizconnect24.com>', 
+        from: 'BizConnect24 <noreply@bizconnect24.com>',
         templateId: 'd-6bfc7e7e38e64cc5965739c974aaca91',
         personalizations: [
           {
@@ -407,13 +408,10 @@ export const sendVerificationReminder = async () => {
     reminderToUpsert = reminderToUpsert.map(data => {
       return { ...data, numberOfTimesSent: data.numberOfTimesSent + 1, modifiedUtc: new Date() };
     });
-    let upsertResult = await afterEffect(reminderToUpsert);
+    let upsertResult = await afterEffectEmailVerify(reminderToUpsert);
     console.log('The result after a try to upsert ' + upsertResult);
     return apiResult;
   } catch (error) {
     console.log('An error occured while trying to send verification mail ', JSON.stringify(error));
   }
 };
-// getAddressToProfileReminderEmail();
-let result = await sendVerificationReminder();
-// console.log(result);
