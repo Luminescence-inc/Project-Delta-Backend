@@ -1,6 +1,9 @@
 export interface UserDetailsForEmail {
   uuid: string;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 650feec (Updated Migration and Reminder Util)
   email: string;
   firstName: string;
 =======
