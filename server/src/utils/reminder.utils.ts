@@ -96,12 +96,11 @@ import { UserDetailsForEmail, ReminderLogDetails } from '@src/types/user';
 import { EmailType } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import sendgrid from '@sendgrid/mail';
-import { hashSync, compareSync } from 'bcrypt';
+import { hashSync } from 'bcrypt';
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 const clientBaseUrl = process.env.CLIENT_BASE_URL;
 
 export interface VerifyEmailData {
-  uuid?: string;
   userUuid: string;
   numberOfTimesSent: number;
   email: string;
@@ -110,21 +109,18 @@ export interface VerifyEmailData {
   emailType?: EmailType;
 }
 
-/**
- * This fetches users that were created beteween 2 hours to 24 hours and has been verified
- */
-
-export const getUserToBusinessProfileEmailRem = async (): Promise<UserDetailsForEmail[]> => {
-  // fetch users who has not been verified with 6 - 24 hours
+export const cleanUpReminderLogs = async (): Promise<string> => {
   const now = new Date();
-  const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
-  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const users = await prisma.user.findMany({
-    where: {
-      createdUtc: {
-        gte: twentyFourHoursAgo,
-        lt: twoHoursAgo,
+  const limitTime = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+  let status: string;
+  try {
+    await prisma.user_profile_reminder_logs.deleteMany({
+      where: {
+        createdUtc: {
+          gt: limitTime,
+        },
       },
+<<<<<<< HEAD
       verified: true,
     },
     select: {
@@ -476,6 +472,14 @@ export const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
     };
   });
   return result;
+=======
+    });
+    status = 'Success';
+  } catch (err) {
+    status = 'Failed: ' + err;
+  }
+  return status;
+>>>>>>> 650feec (Updated Migration and Reminder Util)
 };
 
 /**
@@ -487,33 +491,18 @@ export const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
  * @param {number} emailType The type of email we are looking to send.
  *
  */
-const getFilteredUserFromReminder = async (
-  emailType: EmailType,
-  upperBoundTime: Date,
-  lowerBoundTime: Date,
-  desiredNumberOfTimes: number
-): Promise<ReminderLogDetails[]> => {
+const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
   const reminders = await prisma.user_profile_reminder_logs.findMany({
     where: {
-      modifiedUtc: {
-        gte: lowerBoundTime,
-        lt: upperBoundTime,
-      },
-      emailType: emailType,
-      numberOfTimesSent: {
-        lt: desiredNumberOfTimes,
+      userUuid: {
+        in: userUuid,
       },
     },
     select: {
-      uuid: true,
       userUuid: true,
-      numberOfTimesSent: true,
-      createdUtc: true,
-      modifiedUtc: true,
-      emailType: true,
     },
   });
-  return reminders;
+  return reminders.map(thisReminder => thisReminder.userUuid);
 };
 
 /**
@@ -521,11 +510,15 @@ const getFilteredUserFromReminder = async (
  *
  * @param {string[]} includedUuid The number to raise.
  */
-export const getUsersUsingIds = async (includedUuid: string[]): Promise<{ [x: string]: string[] }> => {
+const getUsersToRemindOfEmailVerification = async (
+  upperBoundTime: Date,
+  lowerBoundTime: Date
+): Promise<UserDetailsForEmail[]> => {
   const users = await prisma.user.findMany({
     where: {
-      uuid: {
-        in: includedUuid,
+      createdUtc: {
+        lt: upperBoundTime,
+        gt: lowerBoundTime,
       },
       verified: false,
     },
@@ -535,49 +528,43 @@ export const getUsersUsingIds = async (includedUuid: string[]): Promise<{ [x: st
       firstName: true,
     },
   });
-  let result: { [x: string]: string[] } = {};
-  users.forEach(usr => {
-    result[usr.uuid] = [usr.email, usr.firstName];
-  });
-  return result;
-};
 
+  return users;
+};
 /**
- * Fetched reminder of type verify email.
- *
+ * This fetches information required send verification email
  */
-const getReminderTypeEmailVerify = async (): Promise<ReminderLogDetails[]> => {
-  let reminderTypeEmailVerify = await prisma.user_profile_reminder_logs.findMany({
-    where: {
-      emailType: EmailType.VERIFY_EMAIL,
-    },
-    select: {
-      uuid: true,
-      userUuid: true,
-    },
-  });
-  return reminderTypeEmailVerify;
+const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
+  const now = new Date();
+  const upperBoundTime = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+  const lowerBoundTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  let potentialUserToSendReminderEmail: UserDetailsForEmail[] = await getUsersToRemindOfEmailVerification(
+    upperBoundTime,
+    lowerBoundTime
+  );
+  let userUuids: string[] = potentialUserToSendReminderEmail.map(thisUser => thisUser.uuid);
+  let emailedUserUUIDs: string[] = await getEmailedUserUUIDs(userUuids);
+
+  let result: VerifyEmailData[] = potentialUserToSendReminderEmail
+    .filter(ptUser => !emailedUserUUIDs.includes(ptUser.uuid))
+    .map(ptUser => {
+      return {
+        numberOfTimesSent: 1,
+        email: ptUser.email,
+        firstName: ptUser.firstName,
+        userUuid: ptUser.uuid,
+      };
+    });
+  return result;
 };
 
 /**
  * This is responsible for updating the database after the email has been sent
  * @param {VerifyEmailData[]} reminderToUpsert a list of object contain information required to update the DB.
  */
-export const afterEffectEmailVerify = async (reminderToUpsert: VerifyEmailData[]): Promise<string> => {
-  let uuidArr: string[] = reminderToUpsert.map(rem => rem.uuid).filter(remUuid => remUuid != undefined);
-  let userUuidArr: string[] = reminderToUpsert.map(rem => rem.userUuid).filter(remUserUUid => remUserUUid != undefined);
-  let reminderTypeEmailVerify: ReminderLogDetails[] = await getReminderTypeEmailVerify();
-  let uuidsToUpdate: string[] = [];
-  let userUuidsToUpdate: { [key: string]: string } = {};
-  reminderTypeEmailVerify.forEach(remToUp => {
-    if (uuidArr.includes(remToUp.uuid)) {
-      uuidsToUpdate.push(remToUp.uuid);
-    }
-    if (userUuidArr.includes(remToUp.userUuid)) {
-      userUuidsToUpdate[remToUp.userUuid] = remToUp.uuid;
-    }
-  });
+const afterEffectEmailVerify = async (reminderToUpsert: VerifyEmailData[]): Promise<string> => {
   let operations = reminderToUpsert.map(thisReminder => {
+<<<<<<< HEAD
     if (Object.keys(userUuidsToUpdate).includes(thisReminder.userUuid)) {
       let theUuid = userUuidsToUpdate[thisReminder.userUuid];
       return prisma.user_profile_reminder_logs.update({
@@ -595,6 +582,8 @@ export const afterEffectEmailVerify = async (reminderToUpsert: VerifyEmailData[]
 export const afterEffect = async () => {};
 >>>>>>> 2b032ad (created the logic for get user to send emails)
 =======
+=======
+>>>>>>> 650feec (Updated Migration and Reminder Util)
     return prisma.user_profile_reminder_logs.create({
       data: {
         uuid: '' + uuidv4(),
@@ -650,6 +639,7 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
       },
       data: {
         uniqueString: hashedUniqueString,
+        expiresUtc: new Date(Date.now() + 21600000),
       },
     });
   });
@@ -671,14 +661,15 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
  */
 export const sendVerificationReminder = async () => {
   let reminderToUpsert = await getReminderRowsThatFit();
+  console.log('The reminder to upsert', reminderToUpsert);
   let userUuids = reminderToUpsert.map(data => {
     return data.userUuid;
   });
 
-  let uniqueString = await getMapOfUserIdToUniqueString(userUuids);
+  let mapOfUserIdToUniqueString = await getMapOfUserIdToUniqueString(userUuids);
   let result = reminderToUpsert.map(data => {
     if (data.email) {
-      let link = `${((clientBaseUrl + '/verify-email/' + data.userUuid) as string) + '/' + uniqueString[data.userUuid]}`;
+      let link = `${((clientBaseUrl + '/verify-email/' + data.userUuid) as string) + '/' + mapOfUserIdToUniqueString[data.userUuid]}`;
       return sendgrid.send({
         from: 'BizConnect24 <noreply@bizconnect24.com>',
         templateId: 'd-6bfc7e7e38e64cc5965739c974aaca91',
@@ -709,9 +700,13 @@ export const sendVerificationReminder = async () => {
   }
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 // getAddressToProfileReminderEmail();
 let result = await sendVerificationReminder();
 // console.log(result);
 >>>>>>> f3a2607 (added logic for scheduling emails)
 =======
 >>>>>>> 7f3e767 (Added logic for email verification)
+=======
+sendVerificationReminder();
+>>>>>>> 650feec (Updated Migration and Reminder Util)

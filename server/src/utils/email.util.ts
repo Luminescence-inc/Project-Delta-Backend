@@ -4,7 +4,6 @@ import sendgrid from '@sendgrid/mail';
 import fs from 'fs';
 import { VerifyEmailData } from './reminder.utils';
 import { EmailType } from '@prisma/client';
-import { afterEffectEmailVerify } from './reminder.utils';
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 
@@ -28,6 +27,7 @@ export const generateVerificationEmail = (
   uniqueString: string,
   firstName: string
 ) => {
+<<<<<<< HEAD
 <<<<<<< HEAD
   return sendgrid.send({
     from: 'BizConnect24 <noreply@bizconnect24.com>',
@@ -77,6 +77,8 @@ export const generateVerificationEmail = (
 =======
   afterEffectEmailVerify([newReminderToSave]);
 
+=======
+>>>>>>> 650feec (Updated Migration and Reminder Util)
   return sendgrid.send({
     from: 'BizConnect24 <noreply@bizconnect24.com>',
     templateId: 'd-91087e5e16dc4548a7e85c769b79fcff', //might have to read from env or config file
