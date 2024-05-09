@@ -1,6 +1,6 @@
 export interface UserDetailsForEmail {
   uuid: string;
-  email?: string;
+  email: string;
   firstName: string;
 }
 
