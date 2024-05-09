@@ -661,7 +661,6 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
  */
 export const sendVerificationReminder = async () => {
   let reminderToUpsert = await getReminderRowsThatFit();
-  console.log('The reminder to upsert', reminderToUpsert);
   let userUuids = reminderToUpsert.map(data => {
     return data.userUuid;
   });
@@ -701,6 +700,7 @@ export const sendVerificationReminder = async () => {
 };
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 // getAddressToProfileReminderEmail();
 let result = await sendVerificationReminder();
 // console.log(result);
@@ -710,3 +710,5 @@ let result = await sendVerificationReminder();
 =======
 sendVerificationReminder();
 >>>>>>> 650feec (Updated Migration and Reminder Util)
+=======
+>>>>>>> fb2747a (Remove uneccessary files)
