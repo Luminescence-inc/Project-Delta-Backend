@@ -273,6 +273,7 @@ export const afterEffect = async (reminderToUpsert: VerifyEmailData[]): Promise<
  */
 export const sendVerificationReminder = async () => {
   let reminderToUpsert = await getReminderRowsThatFit();
+  console.log('The reminder to upsert', reminderToUpsert);
   let userUuids = reminderToUpsert.map(data => {
     return data.userUuid;
   });
@@ -307,3 +308,4 @@ export const sendVerificationReminder = async () => {
     return apiResult;
   } catch (error) {}
 };
+sendVerificationReminder();
