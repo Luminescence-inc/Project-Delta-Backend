@@ -194,7 +194,6 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
  */
 export const sendVerificationReminder = async () => {
   let reminderToUpsert = await getReminderRowsThatFit();
-  console.log('The reminder to upsert', reminderToUpsert);
   let userUuids = reminderToUpsert.map(data => {
     return data.userUuid;
   });
@@ -232,4 +231,3 @@ export const sendVerificationReminder = async () => {
     console.log('An error occured while trying to send verification mail ', JSON.stringify(error));
   }
 };
-sendVerificationReminder();
