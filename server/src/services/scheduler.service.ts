@@ -13,6 +13,7 @@ export const scheduleAJob = () => {
   });
   const jobOne = new SimpleIntervalJob({ hours: 1 }, taskOne, { preventOverrun: true });
   const jobTwo = new SimpleIntervalJob({ hours: 24 }, taskTwo, { preventOverrun: true });
+<<<<<<< HEAD
   scheduler.addSimpleIntervalJob(jobOne);
   scheduler.addSimpleIntervalJob(jobTwo);
 =======
@@ -36,6 +37,8 @@ export const scheduleAJob = () => {
   });
   const jobOne = new SimpleIntervalJob({ hours: 1 }, taskOne, { preventOverrun: true });
   const jobTwo = new SimpleIntervalJob({ hours: 1 }, taskTwo, { preventOverrun: true });
+=======
+>>>>>>> 6704989 (Removed unsused code)
   scheduler.addSimpleIntervalJob(jobOne);
   scheduler.addSimpleIntervalJob(jobTwo);
 >>>>>>> 650feec (Updated Migration and Reminder Util)

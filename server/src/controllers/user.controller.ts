@@ -237,7 +237,6 @@ export default class UserController {
       } else {
         const { expiresUtc, uniqueString: dbHashedUniqueString } = verificationLinks;
         if (expiresUtc < new Date()) {
-          console.log('Did it occur here ');
           // record has expired hence delete record
           await this.userService.deleteVerificationLink(dbHashedUniqueString);
           return respond
@@ -250,8 +249,6 @@ export default class UserController {
             .send();
         }
 
-        console.log('String Two ', compareSync(uniqueString, dbHashedUniqueString));
-        let converted;
         if (compareSync(uniqueString, dbHashedUniqueString)) {
           const user = await this.userService.verifyUserById(userId);
           if (user) {

@@ -1,5 +1,6 @@
 import prisma from '../utils/prisma.client';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { UserDetailsForEmail } from '@src/types/user';
 import { EmailType } from '@prisma/client';
 import { VerificationType } from '@prisma/client';
@@ -93,6 +94,9 @@ const getUsersToRemindOfEmailVerification = async (
         gt: lowerBoundTime,
 =======
 import { UserDetailsForEmail, ReminderLogDetails } from '@src/types/user';
+=======
+import { UserDetailsForEmail } from '@src/types/user';
+>>>>>>> 6704989 (Removed unsused code)
 import { EmailType } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import sendgrid from '@sendgrid/mail';
