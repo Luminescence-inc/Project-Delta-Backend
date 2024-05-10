@@ -2,8 +2,6 @@ import nodemailer from 'nodemailer';
 import handlebars from 'handlebars';
 import sendgrid from '@sendgrid/mail';
 import fs from 'fs';
-import { VerifyEmailData } from './reminder.utils';
-import { EmailType } from '@prisma/client';
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 
