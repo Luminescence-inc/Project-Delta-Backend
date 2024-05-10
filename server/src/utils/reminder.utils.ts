@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.client';
-import { UserDetailsForEmail, ReminderLogDetails } from '@src/types/user';
+import { UserDetailsForEmail } from '@src/types/user';
 import { EmailType } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import sendgrid from '@sendgrid/mail';
