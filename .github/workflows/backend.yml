@@ -5,16 +5,9 @@ on:
     branches:
       - main
       - dev
-  pull_request:
-    branches:
-      - main
-      - dev
-    types:
-      - closed
 jobs:
   build-and-push:
     name: Build and Push to ECR
-    if: ${{ github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Dev' }}
