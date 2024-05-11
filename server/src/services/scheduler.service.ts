@@ -1,6 +1,9 @@
 import { ToadScheduler, SimpleIntervalJob, AsyncTask } from 'toad-scheduler';
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0a4369d (update import, filtering reminder and workflow)
 import { sendVerificationReminder, cleanUpReminderLogs } from '../utils/reminder.utils';
 
 export const scheduleAJob = () => {

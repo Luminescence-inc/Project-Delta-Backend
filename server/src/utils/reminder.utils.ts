@@ -498,6 +498,7 @@ export const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
 const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
   const reminders = await prisma.user_profile_reminder_logs.findMany({
     where: {
+      emailType: EmailType.VERIFY_EMAIL,
       userUuid: {
         in: userUuid,
       },
