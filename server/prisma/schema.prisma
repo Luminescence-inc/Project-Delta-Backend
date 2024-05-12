@@ -11,18 +11,19 @@ datasource db {
 }
 
 model user {
-  uuid              String             @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
-  email             String             @unique @map("email")
-  firstName         String             @map("first_name")
-  lastName          String             @map("last_name")
-  password          String             @map("password")
-  role              Role               @default(CUSTOMER) @map("role")
-  verified          Boolean            @default(false) @map("verified")
-  createdUtc        DateTime           @default(now()) @map("created_utc") @db.Timestamp(6)
-  modifiedUtc       DateTime           @default(now()) @map("modified_utc") @db.Timestamp(6)
-  token             String[]           @map("token")
-  user_verification user_verification[]
-  business_profiles business_profiles[]
+  uuid                       String                       @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  email                      String                       @unique @map("email")
+  firstName                  String                       @map("first_name")
+  lastName                   String                       @map("last_name")
+  password                   String                       @map("password")
+  role                       Role                         @default(CUSTOMER) @map("role")
+  verified                   Boolean                      @default(false) @map("verified")
+  createdUtc                 DateTime                     @default(now()) @map("created_utc") @db.Timestamp(6)
+  modifiedUtc                DateTime                     @default(now()) @map("modified_utc") @db.Timestamp(6)
+  token                      String[]                     @map("token")
+  user_verification          user_verification[]
+  business_profiles          business_profiles[]
+  user_profile_reminder_logs user_profile_reminder_logs[]
 }
 
 model user_verification {
@@ -81,6 +82,19 @@ model business_categories {
   business_profiles business_profiles[]
 }
 
+model user_profile_reminder_logs {
+  uuid                  String       @id @default(dbgenerated("gen_random_uuid()")) @map("uuid") @db.Uuid
+  userUuid              String       @map("user_uuid") @db.Uuid
+  user                  user         @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
+  createdUtc            DateTime     @default(now()) @map("created_utc") @db.Timestamp(6)
+  modifiedUtc           DateTime     @default(now()) @map("modified_utc") @db.Timestamp(6)
+  numberOfTimesSent     Int          @map("number_of_time_sent")
+  emailType             EmailType    @map("email_type")
+  
+
+  @@index([userUuid], map: "user_profile_reminder_logs_idx")
+}
+
 enum Role {
   CUSTOMER
   BUSINESS
@@ -89,4 +103,9 @@ enum Role {
 enum VerificationType {
   EMAIL
   PASSWORD
+}
+
+enum EmailType {
+  VERIFY_EMAIL
+  CREATE_PROFILE
 }

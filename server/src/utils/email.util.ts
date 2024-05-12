@@ -25,7 +25,6 @@ export const generateVerificationEmail = (
   uniqueString: string,
   firstName: string
 ) => {
-
   return sendgrid.send({
     from: 'BizConnect24 <noreply@bizconnect24.com>',
     templateId: 'd-91087e5e16dc4548a7e85c769b79fcff', //might have to read from env or config file
