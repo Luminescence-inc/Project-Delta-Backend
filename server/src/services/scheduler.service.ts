@@ -9,7 +9,7 @@ export const scheduleAJob = () => {
   const taskTwo = new AsyncTask('Delete Stale Reminders', cleanUpReminderLogs, (err: Error) => {
     console.error(err.message);
   });
-  const jobOne = new SimpleIntervalJob({ hours: 5 }, taskOne, { preventOverrun: true });
+  const jobOne = new SimpleIntervalJob({ hours: 1 }, taskOne, { preventOverrun: true });
   const jobTwo = new SimpleIntervalJob({ hours: 24 }, taskTwo, { preventOverrun: true });
   scheduler.addSimpleIntervalJob(jobOne);
   scheduler.addSimpleIntervalJob(jobTwo);
