@@ -51,6 +51,7 @@ jobs:
           echo CLOUDINARY_NAME=${{secrets.CLOUDINARY_NAME}} >> .env
           echo CLOUDINARY_API_KEY=${{secrets.CLOUDINARY_API_KEY}} >> .env
           echo CLOUDINARY_SECRET=${{secrets.CLOUDINARY_SECRET}} >> .env
+          echo SENDGRID_API_KEY=${{secrets.SENDGRID_API_KEY}} >> .env
           cat .env
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
