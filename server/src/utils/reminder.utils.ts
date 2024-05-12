@@ -65,6 +65,7 @@ export const cleanUpReminderLogs = async (): Promise<string> => {
  *
  */
 const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
+<<<<<<< HEAD
   const reminders = await prisma.user_profile_reminder_logs.findMany({
     where: {
       emailType: EmailType.VERIFY_EMAIL,
@@ -516,6 +517,8 @@ export const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
  */
 const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
   console.log('The User UUID ', userUuid);
+=======
+>>>>>>> 397d790 (removed console logs)
   const reminders = await prisma.user_profile_reminder_logs.findMany({
     where: {
       emailType: EmailType.VERIFY_EMAIL,
@@ -527,7 +530,6 @@ const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
       userUuid: true,
     },
   });
-  console.log('The remainder it self', reminders);
   return reminders.map(thisReminder => thisReminder.userUuid);
 };
 
@@ -554,7 +556,6 @@ const getUsersToRemindOfEmailVerification = async (
       firstName: true,
     },
   });
-  console.log('The users ', users);
   return users;
 };
 /**
@@ -570,7 +571,6 @@ const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
   );
   let userUuids: string[] = potentialUserToSendReminderEmail.map(thisUser => thisUser.uuid);
   let emailedUserUUIDs: string[] = await getEmailedUserUUIDs(userUuids);
-  console.log('The Reminders ' + emailedUserUUIDs);
   let result: VerifyEmailData[] = potentialUserToSendReminderEmail
     .filter(ptUser => !emailedUserUUIDs.includes(ptUser.uuid))
     .map(ptUser => {
@@ -700,7 +700,6 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
  */
 export const sendVerificationReminder = async () => {
   let reminderToUpsert = await getReminderRowsThatFit();
-  console.log('Reminders that fit ', reminderToUpsert);
   let userUuids = reminderToUpsert.map(data => {
     return data.userUuid;
   });
@@ -732,11 +731,8 @@ export const sendVerificationReminder = async () => {
       return { ...data, numberOfTimesSent: data.numberOfTimesSent + 1, modifiedUtc: new Date() };
     });
     let upsertResult = await afterEffectEmailVerify(reminderToUpsert);
-    console.log('The result after a try to upsert ' + upsertResult);
     return apiResult;
-  } catch (error) {
-    console.log('An error occured while trying to send verification mail ', JSON.stringify(error));
-  }
+  } catch (error) {}
 };
 <<<<<<< HEAD
 <<<<<<< HEAD
