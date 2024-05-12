@@ -1,7 +1,11 @@
 import prisma from '../utils/prisma.client';
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { UserDetailsForEmail } from '@src/types/user';
+=======
+import { UserDetailsForEmail } from '../types/user';
+>>>>>>> 4e7da04 (updated imports)
 import { EmailType } from '@prisma/client';
 import { VerificationType } from '@prisma/client';
 <<<<<<< HEAD
