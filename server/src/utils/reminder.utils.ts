@@ -4,6 +4,7 @@ import prisma from '../utils/prisma.client';
 import { UserDetailsForEmail } from '@src/types/user';
 import { EmailType } from '@prisma/client';
 import { VerificationType } from '@prisma/client';
+<<<<<<< HEAD
 import { v4 as uuidv4 } from 'uuid';
 import sendgrid from '@sendgrid/mail';
 import { hashSync } from 'bcrypt';
@@ -98,6 +99,8 @@ import { UserDetailsForEmail, ReminderLogDetails } from '@src/types/user';
 import { UserDetailsForEmail } from '@src/types/user';
 >>>>>>> 6704989 (Removed unsused code)
 import { EmailType } from '@prisma/client';
+=======
+>>>>>>> 4e5077a (made the changes)
 import { v4 as uuidv4 } from 'uuid';
 import sendgrid from '@sendgrid/mail';
 import { hashSync } from 'bcrypt';
@@ -113,13 +116,29 @@ export interface VerifyEmailData {
   emailType?: EmailType;
 }
 
+const getVerfiedUserUuid = async (): Promise<string[]> => {
+  let users = await prisma.user.findMany({
+    where: {
+      verified: true,
+    },
+    select: {
+      uuid: true,
+    },
+  });
+  return users.map(usr => usr.uuid);
+};
+
 export const cleanUpReminderLogs = async (): Promise<string> => {
   const now = new Date();
   const limitTime = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+  let verifiedUserUuid = await getVerfiedUserUuid();
   let status: string;
   try {
     await prisma.user_profile_reminder_logs.deleteMany({
       where: {
+        userUuid: {
+          in: verifiedUserUuid,
+        },
         createdUtc: {
           gt: limitTime,
         },
@@ -496,6 +515,7 @@ export const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
  *
  */
 const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
+  console.log('The User UUID ', userUuid);
   const reminders = await prisma.user_profile_reminder_logs.findMany({
     where: {
       emailType: EmailType.VERIFY_EMAIL,
@@ -507,6 +527,7 @@ const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
       userUuid: true,
     },
   });
+  console.log('The remainder it self', reminders);
   return reminders.map(thisReminder => thisReminder.userUuid);
 };
 
@@ -533,7 +554,7 @@ const getUsersToRemindOfEmailVerification = async (
       firstName: true,
     },
   });
-
+  console.log('The users ', users);
   return users;
 };
 /**
@@ -549,7 +570,7 @@ const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
   );
   let userUuids: string[] = potentialUserToSendReminderEmail.map(thisUser => thisUser.uuid);
   let emailedUserUUIDs: string[] = await getEmailedUserUUIDs(userUuids);
-
+  console.log('The Reminders ' + emailedUserUUIDs);
   let result: VerifyEmailData[] = potentialUserToSendReminderEmail
     .filter(ptUser => !emailedUserUUIDs.includes(ptUser.uuid))
     .map(ptUser => {
@@ -594,7 +615,7 @@ export const afterEffect = async () => {};
         uuid: '' + uuidv4(),
         createdUtc: new Date(),
         modifiedUtc: new Date(),
-        emailType: thisReminder.emailType ?? EmailType.CREATE_PROFILE,
+        emailType: thisReminder.emailType ?? EmailType.VERIFY_EMAIL,
         numberOfTimesSent: thisReminder.numberOfTimesSent,
         userUuid: thisReminder.userUuid,
       },
@@ -618,7 +639,7 @@ export const afterEffect = async () => {};
  * @param {VerifyEmailData[]} userUuids a list of user uuids.
  */
 const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key: string]: string }> => {
-  let mapOfUserUuidToUuid: { [key: string]: string } = {};
+  let mapOfUserUuidToUuid: { [key: string]: string | undefined } = {};
   let verification = await prisma.user_verification.findMany({
     where: {
       useruuid: {
@@ -633,18 +654,31 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
   verification.forEach(thisVerification => {
     mapOfUserUuidToUuid[thisVerification.useruuid] = thisVerification.uuid;
   });
+
+  userUuids.forEach(userUuid => {
+    if (!mapOfUserUuidToUuid.hasOwnProperty(userUuid)) {
+      mapOfUserUuidToUuid[userUuid] = undefined;
+    }
+  });
   let result: { [key: string]: string } = {};
   let operations = userUuids.map(thisUuid => {
     const uniqueString = uuidv4() + thisUuid;
     const hashedUniqueString = hashSync(uniqueString, 10);
     result[thisUuid] = uniqueString;
-    return prisma.user_verification.update({
+    return prisma.user_verification.upsert({
       where: {
-        uuid: mapOfUserUuidToUuid[thisUuid],
+        uuid: mapOfUserUuidToUuid[thisUuid] ?? uuidv4(),
       },
-      data: {
+      update: {
         uniqueString: hashedUniqueString,
         expiresUtc: new Date(Date.now() + 21600000),
+      },
+      create: {
+        uniqueString: hashedUniqueString,
+        expiresUtc: new Date(Date.now() + 21600000),
+        createdUtc: new Date(),
+        useruuid: thisUuid,
+        type: VerificationType.EMAIL,
       },
     });
   });
@@ -666,6 +700,7 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
  */
 export const sendVerificationReminder = async () => {
   let reminderToUpsert = await getReminderRowsThatFit();
+  console.log('Reminders that fit ', reminderToUpsert);
   let userUuids = reminderToUpsert.map(data => {
     return data.userUuid;
   });
