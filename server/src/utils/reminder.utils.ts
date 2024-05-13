@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.client.js';
-import { UserDetailsForEmail } from '../types/user';
+import { UserDetailsForEmail } from '../types/user.js';
 import { EmailType } from '@prisma/client';
 import { VerificationType } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
