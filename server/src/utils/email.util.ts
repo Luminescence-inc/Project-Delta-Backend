@@ -8,9 +8,6 @@ sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 const contactSupportTemplateSource = fs.readFileSync('src/templates/contact_support_template.html', 'utf-8').toString();
 const clientBaseUrl = process.env.CLIENT_BASE_URL;
 
-const source = fs.readFileSync('src/templates/email_template.html', 'utf-8').toString();
-const template = handlebars.compile(source);
-
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -28,17 +25,17 @@ export const generateVerificationEmail = (
   return sendgrid.send({
     from: 'BizConnect24 <noreply@bizconnect24.com>',
     templateId: 'd-91087e5e16dc4548a7e85c769b79fcff', //might have to read from env or config file
-    personalizations:[
+    personalizations: [
       {
         to: `${userEmail}`,
         dynamicTemplateData: {
           firstName: `${firstName}`,
-          link: `${clientBaseUrl + '/verify-email/' + userId + '/' + uniqueString}`
+          link: `${clientBaseUrl + '/verify-email/' + userId + '/' + uniqueString}`,
         },
-      } 
-     ],
+      },
+    ],
   });
-}
+};
 
 export const generateForgotPasswordEmail = (
   userId: string,
@@ -46,19 +43,18 @@ export const generateForgotPasswordEmail = (
   uniqueString: string,
   firstName: string
 ) => {
-
   return sendgrid.send({
     from: 'BizConnect24 <noreply@bizconnect24.com>',
     templateId: 'd-13b87dc92793431f97206f4b76058af5', //might have to read from env or config file
-    personalizations:[
+    personalizations: [
       {
         to: `${userEmail}`,
         dynamicTemplateData: {
           firstName: `${firstName}`,
-          link: `${clientBaseUrl + '/forgot-password/reset/' + userId + '/' + uniqueString}`
+          link: `${clientBaseUrl + '/forgot-password/reset/' + userId + '/' + uniqueString}`,
         },
-      } 
-     ],
+      },
+    ],
   });
 };
 
