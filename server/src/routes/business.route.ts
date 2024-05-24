@@ -33,7 +33,7 @@ router.post(
 );
 
 // NEW
-router.post('/businesses/search', businessController.searchBusinessProfileNew);
+router.get('/businesses/search', businessController.searchBusinessProfileNew);
 
 router.post('/business_profile/contact', businessController.contactSupport);
 
