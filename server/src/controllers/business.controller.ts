@@ -136,7 +136,7 @@ export default class BusinessController {
     const keyReplacements = {
       cn: 'country',
       cty: 'city',
-      st: 'stateAndProvinces',
+      st: 'stateAndProvince',
       query: 'name',
       cat: 'businessCategoryUuid',
     };
