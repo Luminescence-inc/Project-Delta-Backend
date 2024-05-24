@@ -10,24 +10,29 @@ import { UpdateUserDetailsSchema } from '../schemas/updateUserDetails.schema.js'
 const router = Router();
 const userController = new UserController();
 
-router.post('/api/user/register', validate(RegisterRequestSchema), userController.registerUser);
+router.post('/user/register', validate(RegisterRequestSchema), userController.registerUser);
 
-router.get('/api/user/details', passport.authenticate('jwt', { session: false }), userController.getUserDetails);
+router.get('/user/details', passport.authenticate('jwt', { session: false }), userController.getUserDetails);
 
-router.post('/api/user/details/update', passport.authenticate('jwt', { session: false }), validate(UpdateUserDetailsSchema), userController.updateUserDetails);
+router.post(
+  '/user/details/update',
+  passport.authenticate('jwt', { session: false }),
+  validate(UpdateUserDetailsSchema),
+  userController.updateUserDetails
+);
 
-router.post('/api/user/login', validate(LoginRequestSchema), userController.loginUser);
+router.post('/user/login', validate(LoginRequestSchema), userController.loginUser);
 
-router.get('/api/user/verify/:userId/:uniqueString', userController.verifyUserEmail);
+router.get('/user/verify/:userId/:uniqueString', userController.verifyUserEmail);
 
-router.post('/api/user/reset_password/:userId/:uniqueString', userController.resetUserPassword);
+router.post('/user/reset_password/:userId/:uniqueString', userController.resetUserPassword);
 
-// router.get('/api/user/generate/verification/:userEmail', userController.generateUserVerificationLink)
+// router.get('/user/generate/verification/:userEmail', userController.generateUserVerificationLink)
 
-router.get('/api/user/generate/forgot_password/:userEmail', userController.generateUserForgotPassLink);
+router.get('/user/generate/forgot_password/:userEmail', userController.generateUserForgotPassLink);
 
 router.get(
-  '/api/user/validateToken',
+  '/user/validateToken',
   passport.authenticate('jwt', { session: false }),
   validate(AuthRequestSchema),
   (req: any, res: any) => {
@@ -35,8 +40,8 @@ router.get(
   }
 );
 
-router.get('/api/user/authenticated/:id', userController.isAuthenticated);
+router.get('/user/authenticated/:id', userController.isAuthenticated);
 
-router.get('/api/user/logout/:id', userController.logOut);
+router.get('/user/logout/:id', userController.logOut);
 
 export default router;
