@@ -6,12 +6,17 @@
   "type": "module",
   "scripts": {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "start:dev": "nodemon",
     "start:prod": "npx prisma migrate deploy && npx prisma generate && node ./dist/src/index.js",
 =======
     "start:dev": "tsx watch src/index.ts",
     "start:prod": "npx prisma generate && npx prisma migrate deploy && node ./dist/src/index.js",
 >>>>>>> 650feec (Updated Migration and Reminder Util)
+=======
+    "start:dev": "nodemon",
+    "start:prod": "npx prisma migrate deploy && npx prisma generate && node ./dist/src/index.js",
+>>>>>>> 519d078 (code optmization)
     "build": " rimraf ./dist && tsc",
     "dbSeed": "npx prisma db seed"
   },
