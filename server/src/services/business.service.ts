@@ -62,6 +62,22 @@ export default class businessService {
     });
   }
 
+  async fetchCategoriesByName(name: string) {
+    const allCategories = await prisma.business_categories.findMany({
+      where: {
+        description: {
+          contains: name,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        uuid: true,
+      },
+    });
+
+    return allCategories.map(category => category.uuid);
+  }
+
   async searchBusinessProfileCount(where: any) {
     return await prisma.business_profiles.count({
       where,
@@ -80,7 +96,7 @@ export default class businessService {
   async findBusinessProfileById(uuid: string) {
     return await prisma.business_profiles.findFirst({
       where: {
-        uuid
+        uuid,
       },
       include: {
         businessCategory: {
