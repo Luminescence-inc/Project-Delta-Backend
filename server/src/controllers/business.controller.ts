@@ -9,6 +9,34 @@ import userService from '../services/user.service.js';
 import { BusinessProfileFilterField } from '../enums/business.enum.js';
 import { ConfigOptions, v2 as cloudinary } from 'cloudinary';
 import { generateSupportEmail } from '../utils/email.util.js';
+import Env from '@src/ config/env.js';
+import prisma from '@src/utils/prisma.client.js';
+
+type Empty = null | undefined | '';
+
+interface IConstructWhereClause {
+  cn: string | Empty;
+  cty?: string | Empty;
+  st?: string | Empty;
+  query?: string | Empty;
+  cat?: string | Empty;
+}
+
+interface IConstructPaginationProperties {
+  page: string | Empty;
+  limit: string | Empty;
+  sortBy?: string | Empty;
+  sortDirection?: string | Empty;
+}
+
+type IWhereClause = {
+  [key: string]: {
+    in?: string[];
+    contains?: string;
+  };
+};
+
+type KeyofIConstructWhereClause = keyof IConstructWhereClause;
 
 export default class BusinessController {
   private businessService: businessService;
@@ -99,6 +127,174 @@ export default class BusinessController {
     } catch (error) {
       console.error(error);
       return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
+    }
+  };
+
+  // construct where clause for prisma
+  private async constructWhereClause(params: IConstructWhereClause): Promise<IWhereClause> {
+    const whereClause: IWhereClause = {};
+    const keyReplacements = {
+      cn: 'country',
+      cty: 'city',
+      st: 'stateAndProvinces',
+      query: 'name',
+      cat: 'businessCategoryUuid',
+    };
+
+    const capitalizeFirstLetter = (str: string): string =>
+      str
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+    const createInClause = (key: string, values: string[]): { [key: string]: { in: string[] } } => ({
+      [key]: {
+        in: values,
+      },
+    });
+
+    const createContainsClause = (
+      key: string,
+      value: string
+    ): { [key: string]: { contains: string; mode: 'insensitive' } } => ({
+      [key]: { contains: value, mode: 'insensitive' },
+    });
+
+    for (const key of Object.keys(params)) {
+      if (!params[key as keyof IConstructWhereClause]) continue;
+
+      const shouldCapitalize = ['cn', 'cty', 'st'].includes(key);
+      const isCategoryKey = key === 'cat';
+      let categories: string[] = [];
+
+      if (isCategoryKey) {
+        categories = await this.businessService.fetchCategoriesByName(params.cat as string);
+      }
+
+      if (categories.length === 0 && isCategoryKey) {
+        delete params[key as keyof IConstructWhereClause];
+        continue;
+      }
+
+      const clauseProps = isCategoryKey
+        ? createInClause(
+            keyReplacements[key] ?? key,
+            shouldCapitalize
+              ? [capitalizeFirstLetter(params[key as keyof IConstructWhereClause] as string)]
+              : categories.length > 0
+                ? categories
+                : [params[key as keyof IConstructWhereClause] as string]
+          )
+        : createContainsClause(
+            keyReplacements[key as keyof IConstructWhereClause] ?? key,
+            shouldCapitalize
+              ? capitalizeFirstLetter(params[key as keyof IConstructWhereClause] as string)
+              : (params[key as keyof IConstructWhereClause] as string)
+          );
+
+      // @ts-expect-error
+      whereClause[keyReplacements[key] ?? key] = clauseProps[keyReplacements[key] ?? key];
+    }
+
+    return whereClause;
+  }
+
+  // construct pagination properties
+  private constructPaginationProperties(params: IConstructPaginationProperties) {
+    const defaultLimit = 10;
+    const defaultPage = 1;
+    const defaultSortBy = 'createdUtc';
+    const defaultSortDirection = 'desc';
+
+    let properties: { take: number; skip: number; orderBy: { [key: string]: 'asc' | 'desc' } } = {
+      take: defaultLimit,
+      skip: 0,
+      orderBy: {
+        [defaultSortBy]: defaultSortDirection as 'asc' | 'desc',
+      },
+    };
+
+    for (const key of Object.keys(params)) {
+      if (
+        params[key as keyof IConstructPaginationProperties] ||
+        typeof params[key as keyof IConstructPaginationProperties] !== 'undefined' ||
+        params[key as keyof IConstructPaginationProperties] !== null
+      ) {
+        switch (key) {
+          case 'page':
+            properties.skip = (Number(params.page ?? defaultPage) - 1) * Number(params.limit ?? defaultLimit);
+            break;
+          case 'limit':
+            properties.take = Number(params.limit ?? defaultLimit);
+            break;
+          case 'sortBy':
+            properties.orderBy = {
+              [(params.sortBy as string) ?? defaultSortBy]:
+                (params.sortDirection as 'asc' | 'desc') ?? defaultSortDirection,
+            };
+            break;
+        }
+      }
+    }
+    return properties;
+  }
+
+  // NEW
+  searchBusinessProfileNew = async (req: Request, res: Response) => {
+    const respond = new SendResponse(res);
+    try {
+      // handle search with query params
+      // default param: cn->country
+      // valid params: cn, cty, st, page, limit, sortBy, sortDirection, query, cat
+      const _url = `${Env.API_URL}${req.url}`;
+      const urlObj = new URL(_url).searchParams;
+
+      const cn = urlObj.get('cn');
+      const cty = urlObj.get('cty');
+      const st = urlObj.get('st');
+      const query = urlObj.get('query');
+      const cat = urlObj.get('cat');
+      const page = urlObj.get('page');
+      const limit = urlObj.get('limit');
+      const sortBy = urlObj.get('sortBy') ?? 'name';
+      const sortDirection = urlObj.get('sortDirection');
+
+      const whereClause = await this.constructWhereClause({ cn, cty, st, query, cat });
+      const paginationProperties = this.constructPaginationProperties({ page, limit, sortBy, sortDirection });
+
+      console.log(whereClause, paginationProperties);
+
+      const profiles = await prisma.business_profiles.findMany({
+        where: {
+          OR: [
+            {
+              ...whereClause,
+            },
+          ],
+        },
+        ...paginationProperties,
+      });
+
+      const LIMIT = 10;
+      const allBusinessProfile = {
+        data: profiles,
+        total: profiles.length,
+        page: Number(page) ?? 1,
+        limit: limit ?? 10,
+        totalPages: Math.ceil(profiles.length / Number(limit ?? LIMIT)),
+      };
+
+      return respond
+        .status(200)
+        .success(true)
+        .code(200)
+        .desc('searched Business Profiles')
+        .responseData({ businessProfiles: allBusinessProfile })
+        .send();
+    } catch (e: any) {
+      console.log(e.message);
+      console.error(e);
+      return respond.status(400).success(false).code(400).desc(`Error: ${e}`).send();
     }
   };
 
