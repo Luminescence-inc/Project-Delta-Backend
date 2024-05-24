@@ -222,10 +222,11 @@ export default class BusinessController {
       ) {
         switch (key) {
           case 'page':
-            properties.skip = (Number(params.page ?? defaultPage) - 1) * Number(params.limit ?? defaultLimit);
+            properties.skip =
+              (Number(params.page ?? defaultPage) - 1) * (params.limit ? Number(params.limit) : defaultLimit);
             break;
           case 'limit':
-            properties.take = Number(params.limit ?? defaultLimit);
+            properties.take = Number(params.limit ? params.limit : defaultLimit);
             break;
           case 'sortBy':
             properties.orderBy = {
@@ -243,21 +244,23 @@ export default class BusinessController {
   searchBusinessProfileNew = async (req: Request, res: Response) => {
     const respond = new SendResponse(res);
     try {
-      // handle search with query params
-      // default param: cn->country
-      // valid params: cn, cty, st, page, limit, sortBy, sortDirection, query, cat
       const _url = `${Env.API_URL}${req.url}`;
       const urlObj = new URL(_url).searchParams;
 
-      const cn = urlObj.get('cn');
-      const cty = urlObj.get('cty');
-      const st = urlObj.get('st');
-      const query = urlObj.get('query');
-      const cat = urlObj.get('cat');
-      const page = urlObj.get('page');
-      const limit = urlObj.get('limit');
-      const sortBy = urlObj.get('sortBy') ?? 'name';
-      const sortDirection = urlObj.get('sortDirection');
+      const sanitizeParam = (param: string | null) => {
+        if (!param) return param;
+        return param.replace(/[^a-zA-Z0-9\s]/g, '');
+      };
+
+      const cn = sanitizeParam(urlObj.get('cn'));
+      const cty = sanitizeParam(urlObj.get('cty'));
+      const st = sanitizeParam(urlObj.get('st'));
+      const query = sanitizeParam(urlObj.get('query'));
+      const cat = sanitizeParam(urlObj.get('cat'));
+      const page = sanitizeParam(urlObj.get('page'));
+      const limit = sanitizeParam(urlObj.get('limit'));
+      const sortBy = sanitizeParam(urlObj.get('sortBy') ?? 'name');
+      const sortDirection = sanitizeParam(urlObj.get('sortDirection'));
 
       const whereClause = await this.constructWhereClause({ cn, cty, st, query, cat });
       const paginationProperties = this.constructPaginationProperties({ page, limit, sortBy, sortDirection });
