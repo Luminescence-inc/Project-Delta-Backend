@@ -10,7 +10,7 @@ const router = Router();
 const businessController = new BusinessController();
 
 router.post(
-  '/api/business_profile/create',
+  '/business_profile/create',
   passport.authenticate('jwt', { session: false }),
   validate(BusinessCreationRequestSchema),
   validate(AuthRequestSchema),
@@ -18,42 +18,46 @@ router.post(
 );
 
 router.post(
-  '/api/business_profile/update/:id',
+  '/business_profile/update/:id',
   passport.authenticate('jwt', { session: false }),
   validate(BusinessCreationRequestSchema),
   validate(AuthRequestSchema),
   businessController.updateBusinessProfile
 );
 
+// OLD
 router.post(
-  '/api/business_profile/search',
+  '/business_profile/search',
   validate(BusinessSearchRequestSchema),
-  businessController.searchBusinessProfile
+  businessController.searchBusinessProfileNew
 );
 
-router.post('/api/business_profile/contact', businessController.contactSupport);
+// NEW
+router.post('/businesses/search', businessController.searchBusinessProfileNew);
+
+router.post('/business_profile/contact', businessController.contactSupport);
 
 router.get(
-  '/api/business_profile/list',
+  '/business_profile/list',
   passport.authenticate('jwt', { session: false }),
   validate(AuthRequestSchema),
   businessController.listAllProfiles
 );
 
-router.get('/api/business_profile/list/:id', businessController.getProfile);
+router.get('/business_profile/list/:id', businessController.getProfile);
 
 router.delete(
-  '/api/business_profile/delete/:id',
+  '/business_profile/delete/:id',
   passport.authenticate('jwt', { session: false }),
   validate(AuthRequestSchema),
   businessController.deleteProfile
 );
 
 // Both Customers and Business Owners have access to this endpoint
-router.get('/api/business_profile/categories', businessController.getBusinessCategories);
+router.get('/business_profile/categories', businessController.getBusinessCategories);
 
 router.get(
-  '/api/business_profile/upload_signature',
+  '/business_profile/upload_signature',
   passport.authenticate('jwt', { session: false }),
   validate(AuthRequestSchema),
   businessController.getUploadSignature
