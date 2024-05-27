@@ -278,13 +278,18 @@ export default class BusinessController {
         ...paginationProperties,
       });
 
+      // Get the total count of profiles matching the criteria
+      const totalProfilesCount = await prisma.business_profiles.count({
+        where: whereClause,
+      });
+
       const LIMIT = 10;
       const allBusinessProfile = {
         data: profiles,
         total: profiles.length,
         page: Number(page) ?? 1,
         limit: limit ?? 10,
-        totalPages: Math.ceil(profiles.length / Number(limit ?? LIMIT)),
+        totalPages: Math.ceil(totalProfilesCount / Number(limit ?? LIMIT)),
       };
 
       return respond
