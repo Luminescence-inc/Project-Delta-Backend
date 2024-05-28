@@ -11,32 +11,7 @@ import { ConfigOptions, v2 as cloudinary } from 'cloudinary';
 import { generateSupportEmail } from '../utils/email.util.js';
 import Env from '@src/ config/env.js';
 import prisma from '@src/utils/prisma.client.js';
-
-type Empty = null | undefined | '';
-
-interface IConstructWhereClause {
-  cn: string | Empty;
-  cty?: string | Empty;
-  st?: string | Empty;
-  query?: string | Empty;
-  cat?: string | Empty;
-}
-
-interface IConstructPaginationProperties {
-  page: string | Empty;
-  limit: string | Empty;
-  sortBy?: string | Empty;
-  sortDirection?: string | Empty;
-}
-
-type IWhereClause = {
-  [key: string]: {
-    in?: string[];
-    contains?: string;
-  };
-};
-
-type KeyofIConstructWhereClause = keyof IConstructWhereClause;
+import { constructPaginationProperties, constructWhereClause } from '@src/utils/business.utils.js';
 
 export default class BusinessController {
   private businessService: businessService;
@@ -130,116 +105,6 @@ export default class BusinessController {
     }
   };
 
-  // construct where clause for prisma
-  private async constructWhereClause(params: IConstructWhereClause): Promise<IWhereClause> {
-    const whereClause: IWhereClause = {};
-    const keyReplacements = {
-      cn: 'country',
-      cty: 'city',
-      st: 'stateAndProvince',
-      query: 'name',
-      cat: 'businessCategoryUuid',
-    };
-
-    const capitalizeFirstLetter = (str: string): string =>
-      str
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-
-    const createInClause = (key: string, values: string[]): { [key: string]: { in: string[] } } => ({
-      [key]: {
-        in: values,
-      },
-    });
-
-    const createContainsClause = (
-      key: string,
-      value: string
-    ): { [key: string]: { contains: string; mode: 'insensitive' } } => ({
-      [key]: { contains: value, mode: 'insensitive' },
-    });
-
-    for (const key of Object.keys(params)) {
-      if (!params[key as keyof IConstructWhereClause]) continue;
-
-      const shouldCapitalize = ['cn', 'cty', 'st'].includes(key);
-      const isCategoryKey = key === 'cat';
-      let categories: string[] = [];
-
-      if (isCategoryKey) {
-        categories = await this.businessService.fetchCategoriesByName(params.cat as string);
-      }
-
-      if (categories.length === 0 && isCategoryKey) {
-        delete params[key as keyof IConstructWhereClause];
-        continue;
-      }
-
-      const clauseProps = isCategoryKey
-        ? createInClause(
-            keyReplacements[key] ?? key,
-            shouldCapitalize
-              ? [capitalizeFirstLetter(params[key as keyof IConstructWhereClause] as string)]
-              : categories.length > 0
-                ? categories
-                : [params[key as keyof IConstructWhereClause] as string]
-          )
-        : createContainsClause(
-            keyReplacements[key as keyof IConstructWhereClause] ?? key,
-            shouldCapitalize
-              ? capitalizeFirstLetter(params[key as keyof IConstructWhereClause] as string)
-              : (params[key as keyof IConstructWhereClause] as string)
-          );
-
-      // @ts-expect-error
-      whereClause[keyReplacements[key] ?? key] = clauseProps[keyReplacements[key] ?? key];
-    }
-
-    return whereClause;
-  }
-
-  // construct pagination properties
-  private constructPaginationProperties(params: IConstructPaginationProperties) {
-    const defaultLimit = 10;
-    const defaultPage = 1;
-    const defaultSortBy = 'createdUtc';
-    const defaultSortDirection = 'desc';
-
-    let properties: { take: number; skip: number; orderBy: { [key: string]: 'asc' | 'desc' } } = {
-      take: defaultLimit,
-      skip: 0,
-      orderBy: {
-        [defaultSortBy]: defaultSortDirection as 'asc' | 'desc',
-      },
-    };
-
-    for (const key of Object.keys(params)) {
-      if (
-        params[key as keyof IConstructPaginationProperties] ||
-        typeof params[key as keyof IConstructPaginationProperties] !== 'undefined' ||
-        params[key as keyof IConstructPaginationProperties] !== null
-      ) {
-        switch (key) {
-          case 'page':
-            properties.skip =
-              (Number(params.page ?? defaultPage) - 1) * (params.limit ? Number(params.limit) : defaultLimit);
-            break;
-          case 'limit':
-            properties.take = Number(params.limit ? params.limit : defaultLimit);
-            break;
-          case 'sortBy':
-            properties.orderBy = {
-              [(params.sortBy as string) ?? defaultSortBy]:
-                (params.sortDirection as 'asc' | 'desc') ?? defaultSortDirection,
-            };
-            break;
-        }
-      }
-    }
-    return properties;
-  }
-
   // NEW
   searchBusinessProfileNew = async (req: Request, res: Response) => {
     const respond = new SendResponse(res);
@@ -249,7 +114,8 @@ export default class BusinessController {
 
       const sanitizeParam = (param: string | null) => {
         if (!param) return param;
-        return param.replace(/[^a-zA-Z0-9\s]/g, '');
+        // remove special characters
+        return param.replace(/[^a-zA-Z0-9\s\/-]/g, '');
       };
 
       const cn = sanitizeParam(urlObj.get('cn'));
@@ -262,8 +128,8 @@ export default class BusinessController {
       const sortBy = sanitizeParam(urlObj.get('sortBy') ?? 'name');
       const sortDirection = sanitizeParam(urlObj.get('sortDirection'));
 
-      const whereClause = await this.constructWhereClause({ cn, cty, st, query, cat });
-      const paginationProperties = this.constructPaginationProperties({ page, limit, sortBy, sortDirection });
+      const whereClause = await constructWhereClause({ cn, cty, st, query, cat });
+      const paginationProperties = constructPaginationProperties({ page, limit, sortBy, sortDirection });
 
       console.log(whereClause, paginationProperties);
 
