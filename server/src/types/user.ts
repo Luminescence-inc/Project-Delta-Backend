@@ -1,18 +1,7 @@
 export interface UserDetailsForEmail {
   uuid: string;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 650feec (Updated Migration and Reminder Util)
   email: string;
   firstName: string;
-=======
-  email?: string;
-<<<<<<< HEAD
->>>>>>> 2b032ad (created the logic for get user to send emails)
-=======
-  firstName: string;
->>>>>>> f3a2607 (added logic for scheduling emails)
 }
 
 export interface ReminderLogDetails {
