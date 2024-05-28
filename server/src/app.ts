@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import express, { Request, Response, type Router } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { Routes } from './types';
 
 // init dot env
 dotenv.config();
