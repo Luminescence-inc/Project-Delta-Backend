@@ -1,7 +1,0 @@
-{
-  "watch": ["src", ".env"],
-  "ext": "ts,json,tsx,jsx,js",
-  "ignore": ["src/**/*.spec.ts"],
-  "exec": "npx tsx ./src/server.ts",
-  "restartable": "rs"
-}
