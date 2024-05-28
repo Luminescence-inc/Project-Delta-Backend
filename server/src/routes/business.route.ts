@@ -18,18 +18,11 @@ router.post(
 );
 
 router.post(
-  '/business_profile/update/:id',
+  '/business-profile/update/:id',
   passport.authenticate('jwt', { session: false }),
   validate(BusinessCreationRequestSchema),
   validate(AuthRequestSchema),
   businessController.updateBusinessProfile
-);
-
-// OLD
-router.post(
-  '/business_profile/search',
-  validate(BusinessSearchRequestSchema),
-  businessController.searchBusinessProfileNew
 );
 
 // NEW
@@ -38,26 +31,26 @@ router.get('/businesses/search', businessController.searchBusinessProfileNew);
 router.post('/business-profile/contact', businessController.contactSupport);
 
 router.get(
-  '/business_profile/list',
+  '/business-profile/list',
   passport.authenticate('jwt', { session: false }),
   validate(AuthRequestSchema),
   businessController.listAllProfiles
 );
 
-router.get('/business_profile/list/:id', businessController.getProfile);
+router.get('/business-profile/list/:id', businessController.getProfile);
 
 router.delete(
-  '/business_profile/delete/:id',
+  '/business-profile/delete/:id',
   passport.authenticate('jwt', { session: false }),
   validate(AuthRequestSchema),
   businessController.deleteProfile
 );
 
 // Both Customers and Business Owners have access to this endpoint
-router.get('/business_profile/categories', businessController.getBusinessCategories);
+router.get('/business-profile/categories', businessController.getBusinessCategories);
 
 router.get(
-  '/business_profile/upload_signature',
+  '/business-profile/upload-signature',
   passport.authenticate('jwt', { session: false }),
   validate(AuthRequestSchema),
   businessController.getUploadSignature
