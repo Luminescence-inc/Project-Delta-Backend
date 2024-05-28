@@ -2,10 +2,6 @@
   "watch": ["src", ".env"],
   "ext": "ts,json,tsx,jsx,js",
   "ignore": ["src/**/*.spec.ts"],
-<<<<<<< HEAD
-  "exec": "npx tsx ./src/server.ts",
-=======
   "exec": "tsx ./src/server.ts",
->>>>>>> 519d078 (code optmization)
   "restartable": "rs"
 }
