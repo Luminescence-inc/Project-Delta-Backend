@@ -35,7 +35,7 @@ router.post(
 // NEW
 router.get('/businesses/search', businessController.searchBusinessProfileNew);
 
-router.post('/business_profile/contact', businessController.contactSupport);
+router.post('/business-profile/contact', businessController.contactSupport);
 
 router.get(
   '/business_profile/list',
