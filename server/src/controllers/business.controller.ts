@@ -11,7 +11,7 @@ import { ConfigOptions, v2 as cloudinary } from 'cloudinary';
 import { generateSupportEmail } from '../utils/email.util.js';
 import Env from '@src/ config/env.js';
 import prisma from '@src/utils/prisma.client.js';
-import { constructPaginationProperties, constructWhereClause } from '@src/utils/business.utils.js';
+import { constructPaginationProperties, constructWhereClause } from '@src/helpers/business.helpers.js';
 
 export default class BusinessController {
   private businessService: businessService;
