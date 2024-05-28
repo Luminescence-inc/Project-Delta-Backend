@@ -57,14 +57,6 @@ export const constructWhereClause = async (params: IConstructWhereClause): Promi
     cat: 'businessCategoryUuid',
   };
 
-  const capitalizeFirstLetter = (str: string) => {
-    if (!str) return str;
-    return str
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
-
   for (const key of Object.keys(params)) {
     if (!params[key as keyof IConstructWhereClause]) continue;
 
