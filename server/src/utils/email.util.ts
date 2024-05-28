@@ -25,58 +25,6 @@ export const generateVerificationEmail = (
   uniqueString: string,
   firstName: string
 ) => {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return sendgrid.send({
-    from: 'BizConnect24 <noreply@bizconnect24.com>',
-    templateId: 'd-91087e5e16dc4548a7e85c769b79fcff', //might have to read from env or config file
-    personalizations:[
-      {
-        to: `${userEmail}`,
-        dynamicTemplateData: {
-          firstName: `${firstName}`,
-          link: `${clientBaseUrl + '/verify-email/' + userId + '/' + uniqueString}`
-        },
-      } 
-     ],
-  });
-}
-=======
-  const date: any = new Date(expiresUtc);
-  const currentTime: any = new Date();
-  const replacements = {
-    title: 'Account Verification Email',
-    content: `Please click on the link below to verify your account and complete registration. Link will expire in ${Math.round(
-      (date - currentTime) / (1000 * 60 * 60)
-    )} hours`,
-    link: `${clientBaseUrl + '/verify-email/' + userId + '/' + uniqueString}`,
-  };
-  const htmlToSend = template(replacements);
-  const mailOptions = {
-    from: process.env.AUTH_EMAIL,
-    to: userEmail,
-    subject: 'Verify Your Email',
-    text: 'Verification Email',
-    html: htmlToSend,
-  };
-
-  let newReminderToSave: VerifyEmailData = {
-    uuid: undefined,
-    firstName: '',
-    modifiedUtc: new Date(),
-    emailType: EmailType.VERIFY_EMAIL,
-    numberOfTimesSent: 1,
-    userUuid: userId,
-    email: userEmail,
-  };
-<<<<<<< HEAD
-  afterEffect([newReminderToSave]);
-  return transporter.sendMail(mailOptions);
-=======
-  afterEffectEmailVerify([newReminderToSave]);
-
-=======
->>>>>>> 650feec (Updated Migration and Reminder Util)
   return sendgrid.send({
     from: 'BizConnect24 <noreply@bizconnect24.com>',
     templateId: 'd-91087e5e16dc4548a7e85c769b79fcff', //might have to read from env or config file
@@ -90,9 +38,7 @@ export const generateVerificationEmail = (
       },
     ],
   });
->>>>>>> 7f3e767 (Added logic for email verification)
 };
->>>>>>> f3a2607 (added logic for scheduling emails)
 
 export const generateForgotPasswordEmail = (
   userId: string,
@@ -100,19 +46,18 @@ export const generateForgotPasswordEmail = (
   uniqueString: string,
   firstName: string
 ) => {
-
   return sendgrid.send({
     from: 'BizConnect24 <noreply@bizconnect24.com>',
     templateId: 'd-13b87dc92793431f97206f4b76058af5', //might have to read from env or config file
-    personalizations:[
+    personalizations: [
       {
         to: `${userEmail}`,
         dynamicTemplateData: {
           firstName: `${firstName}`,
-          link: `${clientBaseUrl + '/forgot-password/reset/' + userId + '/' + uniqueString}`
+          link: `${clientBaseUrl + '/forgot-password/reset/' + userId + '/' + uniqueString}`,
         },
-      } 
-     ],
+      },
+    ],
   });
 };
 
