@@ -152,7 +152,7 @@ export default class BusinessController {
       const LIMIT = 10;
       const allBusinessProfile = {
         data: profiles,
-        total: profiles.length,
+        total: totalProfilesCount,
         page: Number(page) ?? 1,
         limit: limit ?? 10,
         totalPages: Math.ceil(totalProfilesCount / Number(limit ?? LIMIT)),

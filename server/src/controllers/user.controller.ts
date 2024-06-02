@@ -226,9 +226,6 @@ export default class UserController {
       const verificationLinks = await this.userService.findVerificationLinkByUserId(userId, VerificationType.EMAIL);
 
       if (!verificationLinks) {
-        console.log(
-          'Account has been verified or link has expired. logIn to generate new verification link or Check your email for a new verification link'
-        );
         return respond
           .status(400)
           .success(false)
