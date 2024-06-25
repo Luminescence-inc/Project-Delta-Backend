@@ -77,9 +77,9 @@ const randomName = () => {
 
   try {
     // delete all business profiles
-    await prisma.business_profiles.deleteMany();
+    // await prisma.business_profiles.deleteMany();
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 50; i++) {
       const busCat = selectRandomCatories(BUSINESS_CATEGORIES).uuid;
       const location = supportedLocations[Math.floor(Math.random() * supportedLocations.length)];
 

@@ -8,7 +8,8 @@
     "start:dev": "tsx watch ./src/index.ts",
     "start:prod": "npx prisma migrate deploy && npx prisma generate && node ./dist/src/index.js",
     "build": " rimraf ./dist && tsc",
-    "dbSeed": "npx prisma db seed"
+    "dbSeed": "npx prisma db seed",
+    "dbSeed2": "tsx prisma/business.seed.ts"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma",
