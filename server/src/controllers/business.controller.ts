@@ -9,6 +9,9 @@ import userService from '../services/user.service.js';
 import { BusinessProfileFilterField } from '../enums/business.enum.js';
 import { ConfigOptions, v2 as cloudinary } from 'cloudinary';
 import { generateSupportEmail } from '../utils/email.util.js';
+import Env from '@src/ config/env.js';
+import prisma from '@src/utils/prisma.client.js';
+import { constructPaginationProperties, constructWhereClause } from '@src/helpers/business.helpers.js';
 
 export default class BusinessController {
   private businessService: businessService;
@@ -99,6 +102,73 @@ export default class BusinessController {
     } catch (error) {
       console.error(error);
       return respond.status(400).success(false).code(400).desc(`Error: ${error}`).send();
+    }
+  };
+
+  // NEW
+  searchBusinessProfileNew = async (req: Request, res: Response) => {
+    const respond = new SendResponse(res);
+    try {
+      const _url = `${Env.API_URL}${req.url}`;
+      const urlObj = new URL(_url).searchParams;
+
+      const sanitizeParam = (param: string | null) => {
+        if (!param) return param;
+        // Allow a-z, A-Z, 0-9, spaces, /, -, (, and )
+        return param.replace(/[^a-zA-Z0-9\s\/\-\(\)]/g, '');
+      };
+
+      const cn = sanitizeParam(urlObj.get('cn'));
+      const cty = sanitizeParam(urlObj.get('cty'));
+      const st = sanitizeParam(urlObj.get('st'));
+      const query = sanitizeParam(urlObj.get('query'));
+      const cat = sanitizeParam(urlObj.get('cat'));
+      const page = sanitizeParam(urlObj.get('page'));
+      const limit = sanitizeParam(urlObj.get('limit'));
+      const sortBy = sanitizeParam(urlObj.get('sortBy') ?? 'name');
+      const sortDirection = sanitizeParam(urlObj.get('sortDirection'));
+
+      const whereClause = await constructWhereClause({ cn, cty, st, query, cat });
+      const paginationProperties = constructPaginationProperties({ page, limit, sortBy, sortDirection });
+
+      console.log(whereClause, paginationProperties);
+
+      const profiles = await prisma.business_profiles.findMany({
+        where: {
+          OR: [
+            {
+              ...whereClause,
+            },
+          ],
+        },
+        ...paginationProperties,
+      });
+
+      // Get the total count of profiles matching the criteria
+      const totalProfilesCount = await prisma.business_profiles.count({
+        where: whereClause,
+      });
+
+      const LIMIT = 10;
+      const allBusinessProfile = {
+        data: profiles,
+        total: profiles.length,
+        page: Number(page) ?? 1,
+        limit: limit ?? 10,
+        totalPages: Math.ceil(totalProfilesCount / Number(limit ?? LIMIT)),
+      };
+
+      return respond
+        .status(200)
+        .success(true)
+        .code(200)
+        .desc('searched Business Profiles')
+        .responseData({ businessProfiles: allBusinessProfile })
+        .send();
+    } catch (e: any) {
+      console.log(e.message);
+      console.error(e);
+      return respond.status(400).success(false).code(400).desc(`Error: ${e}`).send();
     }
   };
 
