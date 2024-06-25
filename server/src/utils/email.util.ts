@@ -8,9 +8,6 @@ sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 const contactSupportTemplateSource = fs.readFileSync('src/templates/contact_support_template.html', 'utf-8').toString();
 const clientBaseUrl = process.env.CLIENT_BASE_URL;
 
-const source = fs.readFileSync('src/templates/email_template.html', 'utf-8').toString();
-const template = handlebars.compile(source);
-
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {

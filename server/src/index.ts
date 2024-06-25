@@ -29,11 +29,8 @@ app.use((req, res, next) => {
   next();
 });
 
-const routes = [userRoute, businessRoute];
-
-routes.forEach(route => {
-  app.use('/api', route);
-});
+app.use(userRoute);
+app.use(businessRoute);
 
 // Added the schedule to start once job server starts
 app.listen(port, () => {
