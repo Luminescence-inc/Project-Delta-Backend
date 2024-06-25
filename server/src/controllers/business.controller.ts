@@ -114,8 +114,8 @@ export default class BusinessController {
 
       const sanitizeParam = (param: string | null) => {
         if (!param) return param;
-        // remove special characters
-        return param.replace(/[^a-zA-Z0-9\s\/-]/g, '');
+        // Allow a-z, A-Z, 0-9, spaces, /, -, (, and )
+        return param.replace(/[^a-zA-Z0-9\s\/\-\(\)]/g, '');
       };
 
       const cn = sanitizeParam(urlObj.get('cn'));
