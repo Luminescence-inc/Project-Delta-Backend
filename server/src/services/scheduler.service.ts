@@ -9,8 +9,12 @@ export const scheduleAJob = () => {
   const taskTwo = new AsyncTask('Delete Stale Reminders', cleanUpReminderLogs, (err: Error) => {
     console.error(err.message);
   });
-  const jobOne = new SimpleIntervalJob({ hours: 1 }, taskOne, { preventOverrun: true });
-  const jobTwo = new SimpleIntervalJob({ hours: 24 }, taskTwo, { preventOverrun: true });
+  const jobOne = new SimpleIntervalJob({ minutes: 1 }, taskOne, { preventOverrun: true, id: 'id_1' });
+  const jobTwo = new SimpleIntervalJob({ minutes: 24 }, taskTwo, { preventOverrun: true, id: 'id_2' });
   scheduler.addSimpleIntervalJob(jobOne);
   scheduler.addSimpleIntervalJob(jobTwo);
+
+  console.log('The status of sendVerificationReminder job :: ', scheduler.getById('id_1').getStatus()); // returns Error (job not found)
+
+  console.log('The status of cleanUpReminderLogs job :: ', scheduler.getById('id_2').getStatus()); // returns "stopped" and can be started again
 };
