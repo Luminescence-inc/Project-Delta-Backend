@@ -53,12 +53,9 @@ export const cleanUpReminderLogs = async (): Promise<string> => {
 };
 
 /**
- * a helper function for getReminderRowsThatFit, fetches reminder rows that meet the criteria
+ * get userUUid's that has been sent a second mail
  *
- * @param {number} desiredNumberOfTimes The maximum number of time the email needs to be sent .
- * @param {number} upperBoundTime The time that need to elaspe before we send another email
- * @param {number} lowerBoundTime\
- * @param {number} emailType The type of email we are looking to send.
+ * @param {string} userUuid an array of user uuids
  *
  */
 const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
@@ -77,9 +74,7 @@ const getEmailedUserUUIDs = async (userUuid: string[]): Promise<string[]> => {
 };
 
 /**
- * returns a map of userUUid to array of user Email and user firstName
- *
- * @param {string[]} includedUuid The number to raise.
+ * returns user to remind of email verification
  */
 const getUsersToRemindOfEmailVerification = async (
   upperBoundTime: Date,
@@ -101,10 +96,11 @@ const getUsersToRemindOfEmailVerification = async (
   });
   return users;
 };
+
 /**
- * This fetches information required send verification email
+ * This fetches information required to send verification email a second time.
  */
-const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
+const getUserDataForEmail = async (): Promise<VerifyEmailData[]> => {
   const now = new Date();
   const upperBoundTime = new Date(now.getTime() - 5 * 60 * 60 * 1000);
   const lowerBoundTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -114,7 +110,7 @@ const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
   );
   let userUuids: string[] = potentialUserToSendReminderEmail.map(thisUser => thisUser.uuid);
   let emailedUserUUIDs: string[] = await getEmailedUserUUIDs(userUuids);
-  let result: VerifyEmailData[] = potentialUserToSendReminderEmail
+  return potentialUserToSendReminderEmail
     .filter(ptUser => !emailedUserUUIDs.includes(ptUser.uuid))
     .map(ptUser => {
       return {
@@ -124,7 +120,6 @@ const getReminderRowsThatFit = async (): Promise<VerifyEmailData[]> => {
         userUuid: ptUser.uuid,
       };
     });
-  return result;
 };
 
 /**
@@ -156,13 +151,8 @@ const afterEffectEmailVerify = async (reminderToUpsert: VerifyEmailData[]): Prom
     return 'Done';
   }
 };
-
-/**
- * The obtains a map of userId to Unique string for creating a new verification unique string.
- * @param {VerifyEmailData[]} userUuids a list of user uuids.
- */
-const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key: string]: string }> => {
-  let mapOfUserUuidToUuid: { [key: string]: string | undefined } = {};
+const getUserIdToVerficationIdMap = async (userUuids: string[]): Promise<{ [key: string]: string | undefined }> => {
+  let mapOfUserIdToVerficationId: { [key: string]: string | undefined } = {};
   let verification = await prisma.user_verification.findMany({
     where: {
       useruuid: {
@@ -175,14 +165,25 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
     },
   });
   verification.forEach(thisVerification => {
-    mapOfUserUuidToUuid[thisVerification.useruuid] = thisVerification.uuid;
+    mapOfUserIdToVerficationId[thisVerification.useruuid] = thisVerification.uuid;
   });
-
   userUuids.forEach(userUuid => {
-    if (!mapOfUserUuidToUuid.hasOwnProperty(userUuid)) {
-      mapOfUserUuidToUuid[userUuid] = undefined;
+    if (!mapOfUserIdToVerficationId.hasOwnProperty(userUuid)) {
+      mapOfUserIdToVerficationId[userUuid] = undefined;
     }
   });
+  return mapOfUserIdToVerficationId;
+};
+
+/**
+ * This is responsible for updating the database after the email has been sent
+ * @param {{ [key: string]: string | undefined }} mapOfUserIdToVerficationId a map of user Id to verification Id .
+ * @param {string[]} userUuids A list of user ids.
+ */
+const upsertVerficationTable = async (
+  mapOfUserIdToVerficationId: { [key: string]: string | undefined },
+  userUuids: string[]
+): Promise<{ [key: string]: string }> => {
   let result: { [key: string]: string } = {};
   let operations = userUuids.map(thisUuid => {
     const uniqueString = uuidv4() + thisUuid;
@@ -190,7 +191,7 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
     result[thisUuid] = uniqueString;
     return prisma.user_verification.upsert({
       where: {
-        uuid: mapOfUserUuidToUuid[thisUuid] ?? uuidv4(),
+        uuid: mapOfUserIdToVerficationId[thisUuid] ?? uuidv4(),
       },
       update: {
         uniqueString: hashedUniqueString,
@@ -218,17 +219,19 @@ const getMapOfUserIdToUniqueString = async (userUuids: string[]): Promise<{ [key
 };
 
 /**
- * This is responsible for sending email to the users
- *
+ * The obtains a map of userId to Unique string for creating a new verification unique string.
+ * @param {VerifyEmailData[]} userUuids a list of user uuids.
  */
-export const sendVerificationReminder = async () => {
-  let reminderToUpsert = await getReminderRowsThatFit();
-  let userUuids = reminderToUpsert.map(data => {
-    return data.userUuid;
-  });
+const getUserIdToUniqueStringMap = async (userUuids: string[]): Promise<{ [key: string]: string }> => {
+  let mapOfUserIdToVerficationId: { [key: string]: string | undefined } = await getUserIdToVerficationIdMap(userUuids);
+  return upsertVerficationTable(mapOfUserIdToVerficationId, userUuids);
+};
 
-  let mapOfUserIdToUniqueString = await getMapOfUserIdToUniqueString(userUuids);
-  let result = reminderToUpsert.map(data => {
+const generateEmailData = (
+  reminderToInsert: VerifyEmailData[],
+  mapOfUserIdToUniqueString: { [key: string]: string }
+) => {
+  let result = reminderToInsert.map(data => {
     if (data.email) {
       let link = `${((clientBaseUrl + '/verify-email/' + data.userUuid) as string) + '/' + mapOfUserIdToUniqueString[data.userUuid]}`;
       return sendgrid.send({
@@ -247,13 +250,28 @@ export const sendVerificationReminder = async () => {
       });
     }
   });
-
+  return result;
+};
+/**
+ * This is responsible for sending email to the users
+ *
+ */
+export const sendVerificationReminder = async () => {
+  let reminderToUpsert = await getUserDataForEmail();
+  let userUuids = reminderToUpsert.map(data => {
+    return data.userUuid;
+  });
+  let mapOfUserIdToUniqueString = await getUserIdToUniqueStringMap(userUuids);
+  let emailData = generateEmailData(reminderToUpsert, mapOfUserIdToUniqueString);
   try {
-    let apiResult = await Promise.all(result);
+    let apiResult = await Promise.all(emailData);
     reminderToUpsert = reminderToUpsert.map(data => {
       return { ...data, numberOfTimesSent: data.numberOfTimesSent + 1, modifiedUtc: new Date() };
     });
-    let upsertResult = await afterEffectEmailVerify(reminderToUpsert);
+    await afterEffectEmailVerify(reminderToUpsert);
+    console.log('Sending Email successful');
     return apiResult;
-  } catch (error) {}
+  } catch (error) {
+    console.error('Sending Email  Unsuccessful due to : ', error);
+  }
 };

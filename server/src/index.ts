@@ -34,9 +34,9 @@ app.use(businessRoute);
 
 // Added the schedule to start once job server starts
 app.listen(port, () => {
-  console.log(`⚡️[Server]: biz-portal-api is running at http://localhost:${port}`);
   try {
     scheduleAJob();
+    console.log(`⚡️[Server]: biz-portal-api is running at http://localhost:${port}`);
   } catch (err) {
     console.error(err);
   }
